@@ -97,7 +97,6 @@ export function OriginalTab(p: Props) {
           >
             <div className="model-name">{m.label}</div>
             <div className="model-desc">{m.description}</div>
-            <div className="model-size mono">{m.sizeMb} MB · baixa no primeiro uso</div>
           </div>
         ))}
       </div>
@@ -141,7 +140,6 @@ export function OriginalTab(p: Props) {
         <ProgressDialog
           busy={p.busy}
           modelLabel={model.label}
-          modelSizeMb={model.sizeMb}
           duration={dur}
           onCancel={p.onCancel}
         />

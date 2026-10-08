@@ -5,7 +5,6 @@ export interface ModelVariant {
   id: string;
   label: string;
   description: string;
-  sizeMb: number;
   stems: StemId[];
 }
 
@@ -13,22 +12,19 @@ export const MODELS: readonly ModelVariant[] = [
   {
     id: "htdemucs",
     label: "Standard",
-    description: "4 pistas — equilíbrio entre velocidade e qualidade",
-    sizeMb: 84,
+    description: "4 pistas",
     stems: ["drums", "bass", "other", "vocals"],
   },
   {
     id: "htdemucs_6s",
     label: "6-Stem",
-    description: "6 pistas — adiciona guitarra e piano",
-    sizeMb: 84,
+    description: "6 pistas, com guitarra e piano",
     stems: ["drums", "bass", "other", "vocals", "guitar", "piano"],
   },
   {
     id: "htdemucs_ft",
     label: "Fine-Tuned",
-    description: "4 pistas — melhor qualidade, porém bem mais lento",
-    sizeMb: 333,
+    description: "4 pistas, melhor qualidade (mais lento)",
     stems: ["drums", "bass", "other", "vocals"],
   },
 ];

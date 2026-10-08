@@ -10,7 +10,6 @@ export interface BusyState {
 interface Props {
   busy: BusyState;
   modelLabel: string;
-  modelSizeMb: number;
   duration: number;
   onCancel: () => void;
 }
@@ -18,7 +17,7 @@ interface Props {
 const mmss = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
 /** Diálogo modal (bloqueia a interface) com o progresso do download do modelo e da separação. */
-export function ProgressDialog({ busy, modelLabel, modelSizeMb, duration, onCancel }: Props) {
+export function ProgressDialog({ busy, modelLabel, duration, onCancel }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -36,7 +35,7 @@ export function ProgressDialog({ busy, modelLabel, modelSizeMb, duration, onCanc
   const detail = preparing
     ? "Preparando…"
     : busy.phase === "download"
-      ? `${modelLabel} · ${modelSizeMb} MB (só na primeira vez)`
+      ? `${modelLabel} · só na primeira vez`
       : `${modelLabel} · áudio de ${mmss(duration)}`;
 
   return (
