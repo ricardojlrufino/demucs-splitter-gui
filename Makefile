@@ -1,13 +1,13 @@
-.PHONY: wasm wasm-release dev build
+.PHONY: ui run package
 
-wasm:
-	wasm-pack build demucs-wasm --target web --out-dir ../web/src/wasm
+# Compila a interface React para dentro do app Python
+ui:
+	cd web && pnpm install && pnpm build
 
-wasm-release:
-	wasm-pack build demucs-wasm --release --target web --out-dir ../web/src/wasm
+# Abre o app (janela WebUI)
+run: ui
+	cd app && uv run stem-splitter
 
-dev: wasm-release
-	cd web && pnpm install && pnpm exec vite
-
-build: wasm-release
-	cd web && pnpm install && pnpm exec vite build
+# Gera o executável da plataforma atual em dist/stem-splitter
+package: ui
+	cd app && uv run pyinstaller --noconfirm --distpath ../dist stem-splitter.spec

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build --outDir ../app/stem_splitter/ui --emptyOutDir",
     "preview": "vite preview"
   },
   "dependencies": {

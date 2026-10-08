@@ -1,5 +1,8 @@
-target/
 node_modules/
 web/dist/
-web/src/wasm/
+app/stem_splitter/ui/
+app/.venv/
+dist/
+build/
+__pycache__/
 *.tsbuildinfo

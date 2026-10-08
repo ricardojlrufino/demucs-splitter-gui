@@ -1,15 +1,16 @@
 import { useMemo, useState } from "react";
 import { Waveform } from "./Waveform";
 import { Transport } from "./Transport";
-import { usePlayer } from "../hooks/usePlayer";
-import { encodeWavUrl, formatTime } from "../dsp/wav";
 import { DownloadIcon } from "./Icons";
-import { ALL_STEM_LABELS } from "./OriginalTab";
-import type { StemId } from "../models/registry";
+import { usePlayer } from "../hooks/usePlayer";
+import { formatTime } from "../dsp/wav";
+import { STEM_LABELS, type StemId } from "../lib/models";
+import { downloadStem, downloadZip } from "../lib/backend";
 
 export interface StemResult {
   name: StemId;
   buffer: AudioBuffer;
+  path: string;
 }
 
 interface Props {
@@ -19,27 +20,26 @@ interface Props {
   offset: number;
 }
 
-function download(url: string, name: string) {
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = name;
-  a.click();
-}
-
-function saveStem(s: StemResult, baseName: string) {
-  const url = encodeWavUrl(s.buffer.getChannelData(0), s.buffer.getChannelData(1), s.buffer.sampleRate);
-  download(url, `${baseName} - ${s.name}.wav`);
-  setTimeout(() => URL.revokeObjectURL(url), 5000);
-}
-
 export function StemsTab({ ctx, baseName, stems, offset }: Props) {
   const buffers = useMemo(() => stems.map((s) => s.buffer), [stems]);
   const pl = usePlayer(ctx, buffers, null);
   const [vol, setVol] = useState<number[]>(() => stems.map(() => 1));
   const [mute, setMute] = useState<boolean[]>(() => stems.map(() => false));
   const [solo, setSolo] = useState<boolean[]>(() => stems.map(() => false));
+  const [msg, setMsg] = useState<string | null>(null);
 
   const upd = <T,>(arr: T[], i: number, v: T) => arr.map((x, j) => (j === i ? v : x));
+  const fileName = (s: StemResult) => `${baseName} - ${s.name}.wav`;
+
+  const saveOne = (s: StemResult) => {
+    downloadStem(s.path, fileName(s));
+    setMsg(`Baixando ${fileName(s)}…`);
+  };
+
+  const saveAll = () => {
+    downloadZip(stems.map((s) => s.path), baseName);
+    setMsg(`Baixando ${stems.length} pistas em um arquivo zip…`);
+  };
 
   return (
     <div className="tab-body">
@@ -55,20 +55,16 @@ export function StemsTab({ ctx, baseName, stems, offset }: Props) {
           onLoop={pl.setLoop}
         >
           <span className="muted mono">Início no original: {formatTime(offset)}</span>
-          <button
-            className="btn ghost"
-            onClick={() => stems.forEach((s, i) => setTimeout(() => saveStem(s, baseName), i * 300))}
-          >
-            Baixar todas (WAV)
-          </button>
+          <button className="btn ghost" onClick={saveAll}>Baixar todas (zip)</button>
         </Transport>
+        {msg && <p className="hint">{msg}</p>}
       </div>
 
       <div className="stem-list">
         {stems.map((s, i) => (
           <div key={s.name} className={`stem-row stem-${s.name}`}>
             <div className="stem-head">
-              <div className="stem-label">{ALL_STEM_LABELS[s.name]}</div>
+              <div className="stem-label">{STEM_LABELS[s.name]}</div>
               <div className="stem-btns">
                 <button
                   className={`sq${mute[i] ? " on" : ""}`}
@@ -86,7 +82,7 @@ export function StemsTab({ ctx, baseName, stems, offset }: Props) {
                     pl.player.setSolo(i, !solo[i]);
                   }}
                 >S</button>
-                <button className="sq" title="Baixar WAV" onClick={() => saveStem(s, baseName)}><DownloadIcon /></button>
+                <button className="sq" title="Baixar WAV" onClick={() => saveOne(s)}><DownloadIcon /></button>
               </div>
               <input
                 type="range"

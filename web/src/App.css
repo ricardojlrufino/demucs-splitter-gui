@@ -149,9 +149,19 @@ header p { margin: 0 0 24px; }
 .icon-btn.primary svg { width: 20px; height: 20px; }
 .icon-btn.primary svg { margin-left: 0; }
 
-.gpu-badge { margin-top: 14px; font-size: 0.85rem; }
-.gpu-badge.ok { color: #51cf66; }
 .gpu-warn { margin-top: 14px; background: #3a2e12; border: 1px solid #8a6d1f; color: #ffe29a; padding: 12px 16px; border-radius: 10px; font-size: 0.9rem; }
 .gpu-warn p { margin: 8px 0 0; }
 .gpu-warn ul { margin: 8px 0 0; padding-left: 18px; }
 .gpu-warn li { margin: 3px 0; }
+
+/* Ambiente (Demucs / ffmpeg / GPU) */
+.env { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.env-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.env-row > span:first-child { min-width: 110px; font-weight: 600; }
+.env .ok { color: #51cf66; } .env .bad { color: #ff6b6b; } .env .warn { color: #ffd166; }
+.env .device { margin-left: auto; display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 0.85rem; }
+select, .env-path input { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font: inherit; }
+.env-custom summary { cursor: pointer; color: var(--muted); font-size: 0.9rem; }
+.env-path { display: flex; gap: 8px; margin-top: 8px; }
+.env-path input { flex: 1; }
+.alert.pre { white-space: pre-wrap; }
