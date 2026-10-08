@@ -81,11 +81,6 @@ export function OriginalTab(p: Props) {
           selection={p.selection}
           onSelect={p.onSelect}
         />
-        <p className="hint">
-          Arraste na waveform para selecionar um trecho. Puxe a alça verde (início) ou vermelha (fim) para ajustar,
-          arraste o miolo do trecho para movê-lo, clique para posicionar o cursor.
-          Atalhos: <kbd>Espaço</kbd> tocar/pausar · <kbd>Home</kbd> início · <kbd>←</kbd> <kbd>→</kbd> voltar/avançar 1 s (<kbd>Shift</kbd> 5 s).
-        </p>
         <Transport
           playing={pl.playing}
           time={pl.time}
