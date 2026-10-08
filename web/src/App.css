@@ -233,3 +233,8 @@ kbd { font-family: "JetBrains Mono", monospace; font-size: 0.75em; background: v
 
 .transport .format { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 0.85rem; flex-wrap: wrap; }
 @media (max-width: 720px) { .transport .format { width: 100%; justify-content: space-between; } .transport .format select { flex: 1; min-width: 0; } }
+
+.yt-download { display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; margin: -4px 0 14px; padding: 10px 14px; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; }
+.yt-download .format { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 0.85rem; }
+.yt-download .btn { padding: 8px 14px; }
+@media (max-width: 720px) { .yt-download .format, .yt-download .format select { width: 100%; } .yt-download .btn { width: 100%; } }

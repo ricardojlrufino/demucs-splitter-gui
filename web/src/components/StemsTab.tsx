@@ -6,7 +6,8 @@ import { usePlayer } from "../hooks/usePlayer";
 import { useShortcuts } from "../hooks/useShortcuts";
 import { formatTime } from "../dsp/wav";
 import { STEM_LABELS, type StemId } from "../lib/models";
-import { downloadStem, downloadZip, loadSetting, saveSetting } from "../lib/backend";
+import { downloadStem, downloadZip } from "../lib/backend";
+import { FormatSelect, useExportFormat } from "./FormatSelect";
 
 export interface StemResult {
   name: StemId;
@@ -23,12 +24,6 @@ interface Props {
   formats: string[];
 }
 
-const FORMAT_LABELS: Record<string, string> = {
-  ogg: "OGG Vorbis (qualidade máxima)",
-  mp3: "MP3 (V0, mais compatível)",
-  wav: "WAV (sem perdas)",
-};
-
 export function StemsTab({ ctx, baseName, stems, offset, formats }: Props) {
   const buffers = useMemo(() => stems.map((s) => s.buffer), [stems]);
   const pl = usePlayer(ctx, buffers, null);
@@ -37,10 +32,7 @@ export function StemsTab({ ctx, baseName, stems, offset, formats }: Props) {
   const [mute, setMute] = useState<boolean[]>(() => stems.map(() => false));
   const [solo, setSolo] = useState<boolean[]>(() => stems.map(() => false));
   const [msg, setMsg] = useState<string | null>(null);
-  const [format, setFormat] = useState(() => {
-    const saved = loadSetting("exportFormat", "");
-    return formats.includes(saved) ? saved : formats[0] ?? "wav";
-  });
+  const [format, setFormat] = useExportFormat(formats);
 
   const upd = <T,>(arr: T[], i: number, v: T) => arr.map((x, j) => (j === i ? v : x));
   const fileName = (s: StemResult) => `${baseName} - ${s.name}.${format}`;
@@ -69,20 +61,7 @@ export function StemsTab({ ctx, baseName, stems, offset, formats }: Props) {
           onLoop={pl.setLoop}
         >
           <span className="muted mono">Início no original: {formatTime(offset)}</span>
-          <label className="format">
-            Formato
-            <select
-              value={format}
-              onChange={(e) => {
-                setFormat(e.target.value);
-                saveSetting("exportFormat", e.target.value);
-              }}
-            >
-              {formats.map((f) => (
-                <option key={f} value={f}>{FORMAT_LABELS[f] ?? f.toUpperCase()}</option>
-              ))}
-            </select>
-          </label>
+          <FormatSelect formats={formats} value={format} onChange={setFormat} />
           <button className="btn ghost" onClick={saveAll}>Baixar todas (zip)</button>
         </Transport>
         <p className="hint">

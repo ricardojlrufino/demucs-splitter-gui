@@ -27,7 +27,13 @@ export function App() {
   const [demucsPath, setDemucsPath] = useState(() => loadSetting("demucsPath", ""));
   const [device, setDevice] = useState<Device>(() => loadSetting("device", "auto") as Device);
 
-  const [file, setFile] = useState<{ id: string; name: string; buffer: AudioBuffer } | null>(null);
+  const [file, setFile] = useState<{
+    id: string;
+    name: string;
+    wav: string;
+    youtube: boolean;
+    buffer: AudioBuffer;
+  } | null>(null);
   const [loadingFile, setLoadingFile] = useState(false);
   const [fileError, setFileError] = useState<string | null>(null);
   const [selection, setSelection] = useState<Range>({ start: 0, end: 0 });
@@ -50,9 +56,9 @@ export function App() {
   useEffect(() => recheck(demucsPath), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const acceptUpload = useCallback(
-    async (up: { id: string; name: string; wav: string }) => {
+    async (up: { id: string; name: string; wav: string }, youtube = false) => {
       const buffer = await loadAudio(ctx, up.wav);
-      setFile({ id: up.id, name: up.name, buffer });
+      setFile({ id: up.id, name: up.name, wav: up.wav, youtube, buffer });
       setSelection({ start: 0, end: buffer.duration });
       setResult(null);
       setSepError(null);
@@ -93,7 +99,7 @@ export function App() {
         },
         (id) => (ytJob.current = id),
       );
-      await acceptUpload(up);
+      await acceptUpload(up, true);
       setYtUrl("");
     } catch (e) {
       setFileError(errMsg(e));
@@ -222,6 +228,8 @@ export function App() {
             <OriginalTab
               ctx={ctx}
               fileName={file.name}
+              downloadable={file.youtube ? { wav: file.wav } : null}
+              formats={env?.formats?.length ? env.formats : ["wav"]}
               buffer={file.buffer}
               buffers={originalBuffers}
               selection={selection}

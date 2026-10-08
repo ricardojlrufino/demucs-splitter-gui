@@ -1,17 +1,21 @@
 import { Waveform } from "./Waveform";
 import { Transport } from "./Transport";
 import { EnvPanel } from "./EnvPanel";
+import { FormatSelect, useExportFormat } from "./FormatSelect";
 import { ProgressDialog, type BusyState } from "./ProgressDialog";
 import { usePlayer } from "../hooks/usePlayer";
 import { useShortcuts } from "../hooks/useShortcuts";
 import { formatTime } from "../dsp/wav";
 import type { Range } from "../audio/player";
 import { MODELS, type Device } from "../lib/models";
-import type { Environment } from "../lib/backend";
+import { downloadStem, type Environment } from "../lib/backend";
 
 interface Props {
   ctx: AudioContext;
   fileName: string;
+  /** Áudio vindo do YouTube: oferece baixá-lo (em MP3/OGG/WAV). Nulo para arquivos locais. */
+  downloadable: { wav: string } | null;
+  formats: string[];
   buffer: AudioBuffer;
   buffers: AudioBuffer[];
   selection: Range;
@@ -33,6 +37,7 @@ interface Props {
 
 export function OriginalTab(p: Props) {
   const pl = usePlayer(p.ctx, p.buffers, p.selection);
+  const [format, setFormat] = useExportFormat(p.formats);
   useShortcuts(pl);
   const model = MODELS.find((m) => m.id === p.modelId)!;
   const dur = p.selection.end - p.selection.start;
@@ -48,6 +53,21 @@ export function OriginalTab(p: Props) {
         </div>
         <button className="btn ghost" onClick={p.onNewFile} disabled={!!p.busy}>Trocar arquivo</button>
       </div>
+
+      {p.downloadable && (
+        <div className="yt-download">
+          <span className="muted">Áudio importado do YouTube:</span>
+          <FormatSelect formats={p.formats} value={format} onChange={setFormat} />
+          <button
+            className="btn ghost"
+            onClick={() =>
+              downloadStem(p.downloadable!.wav, `${p.fileName.replace(/\.[^.]+$/, "")}.${format}`, format)
+            }
+          >
+            Baixar áudio
+          </button>
+        </div>
+      )}
 
       <div className="panel">
         <Waveform

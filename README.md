@@ -39,6 +39,8 @@ Em vez de abrir um arquivo, você pode colar o link de um vídeo do YouTube na t
 1. Cole o link (`youtube.com/...` ou `youtu.be/...`) no campo **"Ou cole um link do YouTube"**.
 2. Aperte Enter ou clique em **Importar**. O app baixa o áudio e mostra o progresso (dá para cancelar).
 3. Quando terminar, o áudio abre como qualquer arquivo: escolha o trecho, o modelo e clique em separar.
+4. Se quiser **guardar o áudio do vídeo**, use o painel "Áudio importado do YouTube": escolha o formato (OGG, MP3 ou
+   WAV) e clique em **Baixar áudio**. O painel só aparece para áudio vindo do YouTube.
 
 Não precisa instalar nenhum programa extra para isso.
 
