@@ -22,6 +22,17 @@ Na aba **Pistas**, escolha o **Formato** e baixe cada pista (⬇) ou todas de um
 OGG e MP3 dependem do `ffmpeg` ter os codificadores `libvorbis` e `libmp3lame` (a maioria das instalações tem);
 só os formatos disponíveis aparecem na lista. A escolha fica salva para a próxima vez.
 
+## Atalhos de teclado
+Funcionam nas abas Original e Pistas (exceto enquanto digita ou com o diálogo de progresso aberto):
+
+| Tecla | Ação |
+| --- | --- |
+| `Espaço` | tocar / pausar |
+| `Home` | voltar ao início (início do trecho selecionado, se houver) |
+| `←` / `→` | voltar / avançar 5 s (com `Shift`, 1 s) |
+
+A interface se adapta a janelas estreitas e telas de toque (alças de seleção maiores).
+
 ## Importar do YouTube
 Em vez de abrir um arquivo, você pode colar o link de um vídeo do YouTube na tela inicial:
 
