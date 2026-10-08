@@ -11,13 +11,24 @@ O painel "Ambiente" mostra se o Demucs e o ffmpeg foram encontrados e se o PyTor
 modelos são baixados pelo próprio Demucs na primeira execução.
 
 ## Importar do YouTube
-Cole o link na tela inicial e clique em "Importar": o app baixa o áudio e converte para uso. O download usa a biblioteca
-[yt-dlp](https://github.com/yt-dlp/yt-dlp), **embutida no pacote** (não precisa instalar nada). Aceita só links de
-`youtube.com` / `youtu.be`, sem playlists, lives ou vídeos com mais de 3 horas. Respeite os direitos autorais e os
-termos de uso do YouTube: use apenas conteúdo que você tem direito de baixar.
+Em vez de abrir um arquivo, você pode colar o link de um vídeo do YouTube na tela inicial:
 
-O YouTube muda com frequência e o yt-dlp acompanha essas mudanças; se os downloads começarem a falhar, atualize o
-`yt-dlp` (`cd app && uv lock --upgrade-package yt-dlp`) e gere o pacote de novo.
+1. Cole o link (`youtube.com/...` ou `youtu.be/...`) no campo **"Ou cole um link do YouTube"**.
+2. Aperte Enter ou clique em **Importar**. O app baixa o áudio e mostra o progresso (dá para cancelar).
+3. Quando terminar, o áudio abre como qualquer arquivo: escolha o trecho, o modelo e clique em separar.
+
+Não precisa instalar nenhum programa extra para isso.
+
+**Limites:** só links do YouTube, de um vídeo por vez (playlists são ignoradas), sem transmissões ao vivo e sem
+vídeos com mais de 3 horas. Precisa de internet.
+
+**Se o download falhar** com a mensagem de que o vídeo não pôde ser baixado, confira se o link abre no navegador e
+se o vídeo está disponível na sua região. Se outros vídeos também falharem, provavelmente o YouTube mudou algo:
+instale a versão mais recente do aplicativo, que traz o downloader atualizado.
+
+**Aviso legal:** baixar vídeos do YouTube pode ir contra os termos de uso do serviço e contra direitos autorais.
+Use apenas conteúdo que você tem direito de baixar e de processar (por exemplo, suas próprias gravações ou
+material com licença que permita isso). A responsabilidade pelo uso é sua.
 
 ## Como funciona
 Python + [WebUI](https://webui.me): a janela abre no Chrome/Edge/Firefox já instalado (modo app). Um servidor HTTP
@@ -85,6 +96,13 @@ O auto-teste do pacote (usado na CI) confere a interface embutida e a biblioteca
 ## Windows e macOS
 O PyInstaller não faz cross-compile: o pacote de cada sistema é gerado no próprio sistema. A pipeline abaixo faz
 isso e publica um `.zip` por sistema; basta descompactar e executar `demucs-splitter-gui`.
+
+## Manutenção: atualizar o downloader do YouTube
+O download usa a biblioteca [yt-dlp](https://github.com/yt-dlp/yt-dlp), embutida no pacote. O YouTube muda com
+frequência; quando os downloads começarem a falhar, atualize e gere uma nova versão:
+
+    cd app && uv lock --upgrade-package yt-dlp
+    make package          # e publique/instale o novo pacote
 
 ## Pipeline (GitHub Actions)
 `.github/workflows/build.yml` compila a interface, empacota com PyInstaller e roda `--self-test` em Linux x64,
