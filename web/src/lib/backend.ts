@@ -133,11 +133,20 @@ function triggerDownload(href: string) {
   a.remove();
 }
 
-export const downloadStem = (path: string, fileName: string, format: string) =>
-  triggerDownload(url(path, { download: fileName, format }));
+/** Trecho (em segundos) a exportar; omitido = arquivo inteiro. */
+export interface ExportRange {
+  start: number;
+  end: number;
+}
 
-export const downloadZip = (paths: string[], baseName: string, format: string) =>
-  triggerDownload(url("/api/zip", { urls: paths.join(","), base: baseName, format }));
+const rangeParams = (r?: ExportRange | null): Record<string, string> =>
+  r ? { start: r.start.toFixed(3), end: r.end.toFixed(3) } : {};
+
+export const downloadStem = (path: string, fileName: string, format: string, range?: ExportRange | null) =>
+  triggerDownload(url(path, { download: fileName, format, ...rangeParams(range) }));
+
+export const downloadZip = (paths: string[], baseName: string, format: string, range?: ExportRange | null) =>
+  triggerDownload(url("/api/zip", { urls: paths.join(","), base: baseName, format, ...rangeParams(range) }));
 
 const safe = <T,>(fn: () => T, fallback: T): T => {
   try {

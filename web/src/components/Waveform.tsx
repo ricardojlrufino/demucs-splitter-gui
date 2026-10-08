@@ -12,6 +12,8 @@ interface Props {
   /** When provided, the user can drag on the waveform to select a range. */
   selection?: Range | null;
   onSelect?: (r: Range | null) => void;
+  /** Mostra as etiquetas de tempo nas alças (desligue em todas menos uma quando houver várias waveforms). */
+  tags?: boolean;
 }
 
 const EDGE_PX = 8;
@@ -19,7 +21,7 @@ const EDGE_PX_TOUCH = 16;
 const MIN_TAG_PX = 130; // abaixo disso as etiquetas de tempo das alças se sobrepõem
 const MIN_SEL = 0.5;
 
-export function Waveform({ buffer, color, height = 120, time, onSeek, selection, onSelect }: Props) {
+export function Waveform({ buffer, color, height = 120, time, onSeek, selection, onSelect, tags = true }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [width, setWidth] = useState(0);
@@ -93,7 +95,9 @@ export function Waveform({ buffer, color, height = 120, time, onSeek, selection,
     const de = Math.abs(clientX - ex);
     if (ds <= edge && ds <= de) return "start";
     if (de <= edge) return "end";
-    if (clientX > sx && clientX < ex) return "move";
+    // Com tudo selecionado não há o que mover: arrastar no miolo cria uma seleção nova
+    const whole = selection.start <= 0.001 && selection.end >= duration - 0.001;
+    if (!whole && clientX > sx && clientX < ex) return "move";
     return "new";
   };
 
@@ -145,7 +149,7 @@ export function Waveform({ buffer, color, height = 120, time, onSeek, selection,
     : mode === "move" ? (active === "move" ? "grabbing" : "grab")
     : "crosshair";
   const pct = (t: number) => `${(t / duration) * 100}%`;
-  const showTags = selection ? ((selection.end - selection.start) / duration) * width >= MIN_TAG_PX : false;
+  const showTags = tags && selection ? ((selection.end - selection.start) / duration) * width >= MIN_TAG_PX : false;
 
   return (
     <div

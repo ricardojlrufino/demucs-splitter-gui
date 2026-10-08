@@ -25,7 +25,7 @@ from .procs import kill_tree
 
 MAX_UPLOAD = 4 * 1024**3
 _ID = re.compile(r"^[0-9a-f]{12}$")
-_SAFE = re.compile(r"[^\w.\- ()]+", re.UNICODE)
+_SAFE = re.compile(r"[^\w.\- ()\[\]]+", re.UNICODE)
 
 
 class Job:
@@ -210,11 +210,13 @@ def make_handler(app: App):
                 elif path == "/api/zip":
                     self._zip(q)
                 elif path.startswith("/media/"):
-                    self._media(path, q.get("download"), q.get("format"))
+                    self._media(path, q.get("download"), q.get("format"), self._range(q))
                 else:
                     self._json({"error": "não encontrado"}, 404)
             except (BrokenPipeError, ConnectionResetError):
                 pass
+            except ValueError as e:
+                self._json({"error": str(e)}, 400)
             except Exception as e:  # noqa: BLE001
                 self._json({"error": str(e)}, 500)
 
@@ -283,20 +285,37 @@ def make_handler(app: App):
             target = (app.work / rel).resolve()
             return target if target.is_file() and app.work.resolve() in target.parents else None
 
-        def _converted(self, f: Path, fmt: str | None) -> Path:
-            """Versão do arquivo no formato pedido (ogg/mp3), convertida uma vez e guardada ao lado do WAV."""
-            if not fmt or fmt == "wav":
+        @staticmethod
+        def _range(q: dict) -> tuple[float, float] | None:
+            """Trecho pedido pelo cliente (`start`/`end` em segundos), validado; None = arquivo inteiro."""
+            if "start" not in q or "end" not in q:
+                return None
+            try:
+                start, end = float(q["start"]), float(q["end"])
+            except ValueError:
+                raise ValueError("Trecho inválido.") from None
+            if not (0 <= start < end < 24 * 3600):
+                raise ValueError("Trecho inválido.")
+            return start, end
+
+        def _converted(self, f: Path, fmt: str | None, rng: tuple[float, float] | None = None) -> Path:
+            """Versão do arquivo no formato (e trecho) pedidos, gerada uma vez e guardada ao lado do WAV."""
+            fmt = fmt or "wav"
+            if fmt not in ("wav", "ogg", "mp3"):
+                raise ValueError(f"Formato não suportado: {fmt}")
+            if fmt == "wav" and rng is None:
                 return f
-            target = f.with_suffix("." + fmt)
+            tag = f".{round(rng[0] * 1000)}-{round(rng[1] * 1000)}" if rng else ""
+            target = f.with_name(f"{f.stem}{tag}.{fmt}")
             if not target.exists():
-                audio.encode(f, target, fmt)
+                audio.export(f, target, fmt, *(rng or (None, None)))
             return target
 
-        def _media(self, path: str, download: str | None, fmt: str | None = None) -> None:
+        def _media(self, path: str, download: str | None, fmt: str | None = None, rng: tuple[float, float] | None = None) -> None:
             f = self._resolve(unquote(path[len("/media/"):]))
             if not f:
                 return self._json({"error": "arquivo não encontrado"}, 404)
-            f = self._converted(f, fmt)
+            f = self._converted(f, fmt, rng)
             size = f.stat().st_size
             start, end, status = 0, size - 1, 200
             m = re.match(r"bytes=(\d*)-(\d*)", self.headers.get("Range", ""))
@@ -331,11 +350,12 @@ def make_handler(app: App):
             if not files or not all(files):
                 return self._json({"error": "arquivos inválidos"}, 400)
             fmt = q.get("format") or "wav"
+            rng = self._range(q)
             tmp = app.work / f"zip-{uuid.uuid4().hex[:8]}.zip"
             # Áudio já comprimido não encolhe no zip; WAV também é guardado sem compressão (mais rápido)
             with zipfile.ZipFile(tmp, "w", zipfile.ZIP_STORED) as z:
                 for f in files:
-                    z.write(self._converted(f, fmt), f"{_SAFE.sub('_', base)} - {f.stem}.{fmt}")
+                    z.write(self._converted(f, fmt, rng), f"{_SAFE.sub('_', base)} - {f.stem}.{fmt}")
             try:
                 size = tmp.stat().st_size
                 self.send_response(200)

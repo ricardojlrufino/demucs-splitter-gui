@@ -62,3 +62,9 @@ export function formatTime(t: number): string {
   const s = t - m * 60;
   return `${m}:${s.toFixed(1).padStart(4, "0")}`;
 }
+
+/** Trecho para nomes de arquivo (sem ":", que o Windows não aceita): " [0m05s-0m12s]". */
+export function rangeTag(start: number, end: number): string {
+  const f = (t: number) => `${Math.floor(t / 60)}m${String(Math.floor(t % 60)).padStart(2, "0")}s`;
+  return ` [${f(start)}-${f(end)}]`;
+}

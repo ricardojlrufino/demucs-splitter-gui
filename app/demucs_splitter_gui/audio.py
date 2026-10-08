@@ -44,9 +44,16 @@ def available_formats() -> list[str]:
     return found
 
 
-def encode(src: Path, dst: Path, fmt: str) -> None:
-    if fmt not in ENCODERS or fmt not in available_formats():
+def export(src: Path, dst: Path, fmt: str, start: float | None = None, end: float | None = None) -> None:
+    """Gera `dst` no formato `fmt` (wav/ogg/mp3), opcionalmente só com o trecho [start, end] em segundos."""
+    if fmt != "wav" and (fmt not in ENCODERS or fmt not in available_formats()):
         raise ValueError(f"Formato não suportado: {fmt}")
+    codec = ["-c:a", "pcm_s16le"] if fmt == "wav" else ENCODERS[fmt]
+    cut: list[str] = []
+    if start is not None and end is not None:
+        if not (0 <= start < end):
+            raise ValueError("Trecho inválido.")
+        cut = ["-ss", f"{start:.3f}", "-t", f"{end - start:.3f}"]
     tmp = dst.with_name(dst.stem + ".partial" + dst.suffix)
-    _ffmpeg(["-i", str(src), "-vn", *ENCODERS[fmt], str(tmp)])
+    _ffmpeg([*cut, "-i", str(src), "-vn", *codec, str(tmp)])
     tmp.replace(dst)

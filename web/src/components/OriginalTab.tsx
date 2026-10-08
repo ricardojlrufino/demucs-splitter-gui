@@ -5,7 +5,7 @@ import { FormatSelect, useExportFormat } from "./FormatSelect";
 import { ProgressDialog, type BusyState } from "./ProgressDialog";
 import { usePlayer } from "../hooks/usePlayer";
 import { useShortcuts } from "../hooks/useShortcuts";
-import { formatTime } from "../dsp/wav";
+import { formatTime, rangeTag } from "../dsp/wav";
 import type { Range } from "../audio/player";
 import { MODELS, type Device } from "../lib/models";
 import { downloadStem, type Environment } from "../lib/backend";
@@ -60,11 +60,13 @@ export function OriginalTab(p: Props) {
           <FormatSelect formats={p.formats} value={format} onChange={setFormat} />
           <button
             className="btn ghost"
-            onClick={() =>
-              downloadStem(p.downloadable!.wav, `${p.fileName.replace(/\.[^.]+$/, "")}.${format}`, format)
-            }
+            onClick={() => {
+              const base = p.fileName.replace(/\.[^.]+$/, "");
+              const tag = isFull ? "" : rangeTag(p.selection.start, p.selection.end);
+              downloadStem(p.downloadable!.wav, `${base}${tag}.${format}`, format, isFull ? null : p.selection);
+            }}
           >
-            Baixar áudio
+            {isFull ? "Baixar áudio" : "Baixar trecho selecionado"}
           </button>
         </div>
       )}
@@ -81,7 +83,7 @@ export function OriginalTab(p: Props) {
         />
         <p className="hint">
           Arraste na waveform para selecionar um trecho. Puxe a alça verde (início) ou vermelha (fim) para ajustar,
-          arraste o miolo para mover o trecho, clique para posicionar o cursor.
+          arraste o miolo do trecho para movê-lo, clique para posicionar o cursor.
           Atalhos: <kbd>Espaço</kbd> tocar/pausar · <kbd>Home</kbd> início · <kbd>←</kbd> <kbd>→</kbd> voltar/avançar 1 s (<kbd>Shift</kbd> 5 s).
         </p>
         <Transport

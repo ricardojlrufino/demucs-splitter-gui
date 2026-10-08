@@ -11,7 +11,11 @@ O painel "Ambiente" mostra se o Demucs e o ffmpeg foram encontrados e se o PyTor
 modelos são baixados pelo próprio Demucs na primeira execução.
 
 ## Exportar as pistas
-Na aba **Pistas**, escolha o **Formato** e baixe cada pista (⬇) ou todas de uma vez em um `.zip`:
+Na aba **Pistas**, escolha o **Formato** e baixe cada pista (⬇) ou todas de uma vez em um `.zip`.
+
+**Só um trecho:** arraste em qualquer waveform para selecionar um trecho (puxe as alças para ajustar, "selecionar
+tudo" desfaz). A seleção vale para todas as pistas: a reprodução fica restrita a ela e os downloads (⬇ e zip) saem
+cortados no trecho, com o intervalo no nome (`musica - bateria [0m06s-0m12s].ogg`). Sem seleção, baixa a pista inteira.
 
 | Formato | Qualidade |
 | --- | --- |
@@ -40,7 +44,8 @@ Em vez de abrir um arquivo, você pode colar o link de um vídeo do YouTube na t
 2. Aperte Enter ou clique em **Importar**. O app baixa o áudio e mostra o progresso (dá para cancelar).
 3. Quando terminar, o áudio abre como qualquer arquivo: escolha o trecho, o modelo e clique em separar.
 4. Se quiser **guardar o áudio do vídeo**, use o painel "Áudio importado do YouTube": escolha o formato (OGG, MP3 ou
-   WAV) e clique em **Baixar áudio**. O painel só aparece para áudio vindo do YouTube.
+   WAV) e clique em **Baixar áudio** (ou **Baixar trecho selecionado**, se você marcou só uma parte). O painel só
+   aparece para áudio vindo do YouTube.
 
 Não precisa instalar nenhum programa extra para isso.
 
