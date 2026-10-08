@@ -25,30 +25,33 @@ def cut(src: Path, dst: Path, start: float, duration: float) -> None:
     _ffmpeg(["-ss", f"{start:.3f}", "-t", f"{duration:.3f}", "-i", str(src), "-c:a", "pcm_s16le", str(dst)])
 
 
-# Qualidade máxima de cada codificador: Vorbis q10 (~500 kbps VBR) e MP3 V0 (~245 kbps VBR).
-ENCODERS = {
-    "ogg": ["-c:a", "libvorbis", "-q:a", "10"],
-    "mp3": ["-c:a", "libmp3lame", "-q:a", "0"],
+# Formatos de exportação. "ogg" é o padrão (Vorbis q7, ~145-225 kbps: qualidade muito alta e arquivos bem menores);
+# "ogg-max" usa q10 (~350-570 kbps, arquivos grandes). MP3 em V0 (~245 kbps VBR).
+FORMATS: dict[str, dict] = {
+    "ogg": {"ext": "ogg", "needs": "libvorbis", "args": ["-c:a", "libvorbis", "-q:a", "7"]},
+    "ogg-max": {"ext": "ogg", "needs": "libvorbis", "args": ["-c:a", "libvorbis", "-q:a", "10"]},
+    "mp3": {"ext": "mp3", "needs": "libmp3lame", "args": ["-c:a", "libmp3lame", "-q:a", "0"]},
+    "wav": {"ext": "wav", "needs": None, "args": ["-c:a", "pcm_s16le"]},
 }
-_NEEDS = {"ogg": "libvorbis", "mp3": "libmp3lame"}
+
+
+def extension(fmt: str) -> str:
+    return FORMATS[fmt]["ext"]
 
 
 @lru_cache(maxsize=1)
 def available_formats() -> list[str]:
-    """Formatos de exportação suportados pelo ffmpeg instalado, do melhor para o mais compatível (WAV por último)."""
-    found = ["wav"]
+    """Formatos de exportação suportados pelo ffmpeg instalado, em ordem de preferência (WAV por último)."""
     ffmpeg = find_ffmpeg()
-    if ffmpeg:
-        out = run([ffmpeg, "-hide_banner", "-encoders"]).stdout
-        found = [f for f, enc in _NEEDS.items() if enc in out] + found
-    return found
+    encoders = run([ffmpeg, "-hide_banner", "-encoders"]).stdout if ffmpeg else ""
+    return [k for k, f in FORMATS.items() if f["needs"] is None or f["needs"] in encoders]
 
 
 def export(src: Path, dst: Path, fmt: str, start: float | None = None, end: float | None = None) -> None:
     """Gera `dst` no formato `fmt` (wav/ogg/mp3), opcionalmente só com o trecho [start, end] em segundos."""
-    if fmt != "wav" and (fmt not in ENCODERS or fmt not in available_formats()):
+    if fmt not in available_formats():
         raise ValueError(f"Formato não suportado: {fmt}")
-    codec = ["-c:a", "pcm_s16le"] if fmt == "wav" else ENCODERS[fmt]
+    codec = FORMATS[fmt]["args"]
     cut: list[str] = []
     if start is not None and end is not None:
         if not (0 <= start < end):

@@ -2,10 +2,14 @@ import { useState } from "react";
 import { loadSetting, saveSetting } from "../lib/backend";
 
 export const FORMAT_LABELS: Record<string, string> = {
-  ogg: "OGG Vorbis (qualidade máxima)",
+  ogg: "OGG Vorbis (alta qualidade, arquivo menor)",
+  "ogg-max": "OGG Vorbis (máxima, arquivo grande)",
   mp3: "MP3 (V0, mais compatível)",
   wav: "WAV (sem perdas)",
 };
+
+/** Extensão do arquivo para um formato ("ogg-max" também é .ogg). */
+export const extOf = (format: string) => (format === "ogg-max" ? "ogg" : format);
 
 /** Formato de exportação escolhido (lembrado entre execuções); cai no melhor disponível se o salvo não existir. */
 export function useExportFormat(formats: string[]): [string, (f: string) => void] {

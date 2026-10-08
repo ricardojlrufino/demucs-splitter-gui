@@ -1,7 +1,7 @@
 import { Waveform } from "./Waveform";
 import { Transport } from "./Transport";
 import { EnvPanel } from "./EnvPanel";
-import { FormatSelect, useExportFormat } from "./FormatSelect";
+import { FormatSelect, extOf, useExportFormat } from "./FormatSelect";
 import { ProgressDialog, type BusyState } from "./ProgressDialog";
 import { usePlayer } from "../hooks/usePlayer";
 import { useShortcuts } from "../hooks/useShortcuts";
@@ -63,7 +63,7 @@ export function OriginalTab(p: Props) {
             onClick={() => {
               const base = p.fileName.replace(/\.[^.]+$/, "");
               const tag = isFull ? "" : rangeTag(p.selection.start, p.selection.end);
-              downloadStem(p.downloadable!.wav, `${base}${tag}.${format}`, format, isFull ? null : p.selection);
+              downloadStem(p.downloadable!.wav, `${base}${tag}.${extOf(format)}`, format, isFull ? null : p.selection);
             }}
           >
             {isFull ? "Baixar áudio" : "Baixar trecho selecionado"}

@@ -8,7 +8,7 @@ import { formatTime, rangeTag } from "../dsp/wav";
 import { STEM_LABELS, type StemId } from "../lib/models";
 import { downloadStem, downloadZip, type ExportRange } from "../lib/backend";
 import type { Range } from "../audio/player";
-import { FormatSelect, useExportFormat } from "./FormatSelect";
+import { FormatSelect, extOf, useExportFormat } from "./FormatSelect";
 
 export interface StemResult {
   name: StemId;
@@ -41,7 +41,7 @@ export function StemsTab({ ctx, baseName, stems, offset, formats }: Props) {
 
   const upd = <T,>(arr: T[], i: number, v: T) => arr.map((x, j) => (j === i ? v : x));
   const suffix = range ? rangeTag(range.start, range.end) : "";
-  const fileName = (s: StemResult) => `${baseName} - ${s.name}${suffix}.${format}`;
+  const fileName = (s: StemResult) => `${baseName} - ${s.name}${suffix}.${extOf(format)}`;
 
   const saveOne = (s: StemResult) => {
     downloadStem(s.path, fileName(s), format, range);
@@ -108,7 +108,7 @@ export function StemsTab({ ctx, baseName, stems, offset, formats }: Props) {
                     pl.player.setSolo(i, !solo[i]);
                   }}
                 >S</button>
-                <button className="sq" title={`Baixar ${isFull ? "" : "trecho em "}${format.toUpperCase()}`} onClick={() => saveOne(s)}><DownloadIcon /></button>
+                <button className="sq" title={`Baixar ${isFull ? "" : "trecho em "}${extOf(format).toUpperCase()}`} onClick={() => saveOne(s)}><DownloadIcon /></button>
               </div>
               <input
                 type="range"

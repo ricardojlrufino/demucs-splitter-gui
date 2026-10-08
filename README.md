@@ -17,11 +17,14 @@ Na aba **Pistas**, escolha o **Formato** e baixe cada pista (⬇) ou todas de um
 tudo" desfaz). A seleção vale para todas as pistas: a reprodução fica restrita a ela e os downloads (⬇ e zip) saem
 cortados no trecho, com o intervalo no nome (`musica - bateria [0m06s-0m12s].ogg`). Sem seleção, baixa a pista inteira.
 
-| Formato | Qualidade |
-| --- | --- |
-| **OGG Vorbis** (padrão) | Máxima (q10, ~500 kbps VBR). Melhor qualidade entre os formatos com compressão. |
-| MP3 (V0) | Alta (~245 kbps VBR), toca em qualquer aparelho e programa. |
-| WAV | Sem perdas, arquivos grandes. |
+| Formato | Qualidade | Tamanho (pista de 4 min*) |
+| --- | --- | --- |
+| **OGG Vorbis, alta qualidade** (padrão) | q7, ~145-225 kbps VBR. Muito alta; difícil distinguir do original. | ~4 MB |
+| OGG Vorbis, máxima | q10, ~350-570 kbps VBR. Para quem quer o máximo e aceita arquivos grandes. | ~10 MB (até 17 MB em pistas cheias) |
+| MP3 (V0) | ~245 kbps VBR. Toca em qualquer aparelho e programa. | ~7 MB |
+| WAV | Sem perdas. | ~40 MB |
+
+\* Medido numa pista de baixo de 4 min; o tamanho varia com o conteúdo (pistas com mais instrumentos ficam maiores).
 
 OGG e MP3 dependem do `ffmpeg` ter os codificadores `libvorbis` e `libmp3lame` (a maioria das instalações tem);
 só os formatos disponíveis aparecem na lista. A escolha fica salva para a próxima vez.

@@ -301,12 +301,12 @@ def make_handler(app: App):
         def _converted(self, f: Path, fmt: str | None, rng: tuple[float, float] | None = None) -> Path:
             """Versão do arquivo no formato (e trecho) pedidos, gerada uma vez e guardada ao lado do WAV."""
             fmt = fmt or "wav"
-            if fmt not in ("wav", "ogg", "mp3"):
+            if fmt not in audio.FORMATS:
                 raise ValueError(f"Formato não suportado: {fmt}")
             if fmt == "wav" and rng is None:
                 return f
             tag = f".{round(rng[0] * 1000)}-{round(rng[1] * 1000)}" if rng else ""
-            target = f.with_name(f"{f.stem}{tag}.{fmt}")
+            target = f.with_name(f"{f.stem}{tag}.{fmt}.{audio.extension(fmt)}" if fmt != audio.extension(fmt) else f"{f.stem}{tag}.{fmt}")
             if not target.exists():
                 audio.export(f, target, fmt, *(rng or (None, None)))
             return target
@@ -355,7 +355,7 @@ def make_handler(app: App):
             # Áudio já comprimido não encolhe no zip; WAV também é guardado sem compressão (mais rápido)
             with zipfile.ZipFile(tmp, "w", zipfile.ZIP_STORED) as z:
                 for f in files:
-                    z.write(self._converted(f, fmt, rng), f"{_SAFE.sub('_', base)} - {f.stem}.{fmt}")
+                    z.write(self._converted(f, fmt, rng), f"{_SAFE.sub('_', base)} - {f.stem}.{audio.extension(fmt)}")
             try:
                 size = tmp.stat().st_size
                 self.send_response(200)
