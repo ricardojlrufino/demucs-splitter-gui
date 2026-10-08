@@ -31,3 +31,11 @@ executa o `demucs` e envia o progresso à interface. A interface (React) fica em
 
 O PyInstaller não faz cross-compile: gere o pacote de cada sistema (Linux, macOS, Windows) no próprio sistema,
 por exemplo com uma matriz de jobs no GitHub Actions.
+
+## Pipeline (GitHub Actions)
+`.github/workflows/build.yml` compila a interface, empacota com PyInstaller e roda `--self-test` em Linux x64,
+Windows x64, macOS arm64 e macOS x64. Cada job publica um artefato (`stem-splitter-<sistema>.tar.gz|zip`); ao
+enviar uma tag `v*` (ex.: `git tag v0.1.0 && git push --tags`) os pacotes são anexados a um Release.
+
+Os pacotes não são assinados: o macOS pede "Abrir mesmo assim" (Ajustes > Privacidade e Segurança) e o
+Windows pode mostrar o aviso do SmartScreen.
