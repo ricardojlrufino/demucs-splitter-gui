@@ -27,7 +27,7 @@ body {
 }
 .mono { font-family: "JetBrains Mono", monospace; font-size: 0.85rem; }
 .muted { color: var(--muted); }
-.app { max-width: 980px; margin: 0 auto; padding: 24px 16px 64px; }
+.app { width: 100%; padding: 24px clamp(12px, 2.5vw, 40px) 64px; }
 header h1 { font-family: "Syne", sans-serif; font-size: 2rem; margin: 0 0 4px; }
 header p { margin: 0 0 24px; }
 
