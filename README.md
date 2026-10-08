@@ -62,8 +62,12 @@ Atualizar é repetir os passos 3 e 4 com os fontes novos.
 > `/usr/bin/make`.
 
 ## Desenvolvimento
-    make run        # compila a interface e abre o app direto dos fontes, sem instalar
+    make dev        # interface com hot reload: API local (sem janela) + Vite; abra http://localhost:1420
+    make run        # compila a interface e abre o app direto dos fontes (janela WebUI), sem instalar
     make ui         # só recompila a interface React
+
+O `make dev` é o mais rápido para mexer na interface: a API local sobe sem janela e o Vite recarrega a página a
+cada alteração em `web/src`. Ctrl+C encerra os dois.
 
 O auto-teste do pacote (usado na CI) confere a interface embutida e a biblioteca do WebUI, sem abrir janela:
 

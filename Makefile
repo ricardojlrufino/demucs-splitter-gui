@@ -1,8 +1,20 @@
-.PHONY: ui run package install uninstall
+SHELL := /bin/bash
+.PHONY: ui dev run package install uninstall
 
 # Compila a interface React para dentro do app Python
 ui:
 	cd web && pnpm install && pnpm build
+
+# Desenvolvimento da interface: API local (sem janela) + Vite com hot reload. Abra http://localhost:1420
+# Ctrl+C encerra os dois.
+dev:
+	cd web && pnpm install
+	@rm -f .dev-api.json
+	@cd app && uv run python -m demucs_splitter_gui --api-only ../.dev-api.json & api=$$!; \
+	trap 'kill $$api 2>/dev/null; wait $$api 2>/dev/null' EXIT INT TERM; \
+	for i in $$(seq 1 100); do [ -f .dev-api.json ] && break; sleep 0.1; done; \
+	[ -f .dev-api.json ] || { echo "A API não iniciou."; exit 1; }; \
+	cd web && pnpm exec vite
 
 # Abre o app (janela WebUI)
 run: ui

@@ -66,9 +66,36 @@ def self_test() -> int:
     return 0
 
 
+def api_only(config_path: Path) -> int:
+    """Modo de desenvolvimento: só a API local, sem janela. Escreve porta e token em `config_path`
+    para o servidor de desenvolvimento da interface (Vite) ler."""
+    import signal
+    import threading
+
+    app = App()
+    app.start()
+    config_path.write_text(json.dumps({"base": f"http://127.0.0.1:{app.port}", "token": app.token}))
+    stop = threading.Event()
+    for sig in (signal.SIGINT, signal.SIGTERM):
+        signal.signal(sig, lambda *_: stop.set())
+    print(f"API em http://127.0.0.1:{app.port} (config em {config_path})", flush=True)
+    try:
+        stop.wait()
+    finally:
+        config_path.unlink(missing_ok=True)
+        app.shutdown()
+    return 0
+
+
 def main() -> int:
     if "--self-test" in sys.argv:
         return self_test()
+    if "--api-only" in sys.argv:
+        i = sys.argv.index("--api-only")
+        if i + 1 >= len(sys.argv):
+            print("Uso: --api-only <arquivo-de-config.json>", file=sys.stderr)
+            return 2
+        return api_only(Path(sys.argv[i + 1]).resolve())
     cleanup_stale()
     ui = resource_dir()
     if not (ui / "index.html").exists():
