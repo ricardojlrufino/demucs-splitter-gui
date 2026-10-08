@@ -32,6 +32,13 @@ executa o `demucs` e envia o progresso à interface. A interface (React) fica em
 O PyInstaller não faz cross-compile: gere o pacote de cada sistema (Linux, macOS, Windows) no próprio sistema,
 por exemplo com uma matriz de jobs no GitHub Actions.
 
+## Instalar no Linux
+    make package && sudo make install      # em /usr/local (app em lib/stem-splitter, link em bin, atalho no menu)
+    sudo make uninstall
+
+Outros destinos: `PREFIX=/usr`, `PREFIX=$HOME/.local` (sem sudo) ou `DESTDIR=/pasta` (para montar pacotes).
+Rode o `make package` como usuário comum (não com sudo), pois o `uv` e o `pnpm` ficam no seu PATH.
+
 ## Pipeline (GitHub Actions)
 `.github/workflows/build.yml` compila a interface, empacota com PyInstaller e roda `--self-test` em Linux x64,
 Windows x64, macOS arm64 e macOS x64. Cada job publica um artefato (`stem-splitter-<sistema>.tar.gz|zip`); ao
