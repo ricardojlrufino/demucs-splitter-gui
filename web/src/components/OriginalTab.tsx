@@ -1,6 +1,7 @@
 import { Waveform } from "./Waveform";
 import { Transport } from "./Transport";
 import { EnvPanel } from "./EnvPanel";
+import { ProgressDialog, type BusyState } from "./ProgressDialog";
 import { usePlayer } from "../hooks/usePlayer";
 import { formatTime } from "../dsp/wav";
 import type { Range } from "../audio/player";
@@ -24,7 +25,7 @@ interface Props {
   demucsPath: string;
   onDemucsPathChange: (p: string) => void;
   onRecheck: () => void;
-  busy: { phase: "download" | "separate"; progress: number; elapsed: number; status: string } | null;
+  busy: BusyState | null;
   error: string | null;
   onSeparate: () => void;
   onCancel: () => void;
@@ -124,33 +125,27 @@ export function OriginalTab(p: Props) {
       {p.error && <div className="alert pre">{p.error}</div>}
 
       <div className="action-row">
-        {p.busy ? (
-          <>
-            <div className="progress-box">
-              <div className="bar big"><div style={{ width: `${p.busy.progress}%` }} /></div>
-              <span className="mono muted">
-                {p.busy.phase === "download" ? `Baixando modelo (${model.sizeMb} MB)…` : "Separando…"}{" "}
-                {Math.round(p.busy.progress)}% · {p.busy.elapsed.toFixed(0)}s
-                {p.busy.phase === "separate" && p.busy.progress > 2 && p.busy.progress < 100
-                  ? ` · restante ~${Math.round((p.busy.elapsed * (100 - p.busy.progress)) / p.busy.progress)}s`
-                  : ""}
-              </span>
-            </div>
-            <button className="btn ghost" onClick={p.onCancel}>Cancelar</button>
-          </>
-        ) : (
-          <button
-            className="btn primary"
-            disabled={!canRun}
-            onClick={() => {
-              pl.stop();
-              p.onSeparate();
-            }}
-          >
-            Separar {isFull ? "arquivo inteiro" : "trecho selecionado"} ({formatTime(dur)})
-          </button>
-        )}
+        <button
+          className="btn primary"
+          disabled={!canRun || !!p.busy}
+          onClick={() => {
+            pl.stop();
+            p.onSeparate();
+          }}
+        >
+          Separar {isFull ? "arquivo inteiro" : "trecho selecionado"} ({formatTime(dur)})
+        </button>
       </div>
+
+      {p.busy && (
+        <ProgressDialog
+          busy={p.busy}
+          modelLabel={model.label}
+          modelSizeMb={model.sizeMb}
+          duration={dur}
+          onCancel={p.onCancel}
+        />
+      )}
     </div>
   );
 }
