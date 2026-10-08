@@ -73,26 +73,15 @@ export interface Handlers {
   onStatus: (text: string) => void;
 }
 
-/** Inicia a separação e acompanha o progresso (SSE) até o fim. */
-export async function separate(
-  req: SeparateRequest,
-  h: Handlers,
-  onJob: (jobId: string) => void,
-): Promise<StemFile[]> {
-  const { job } = await fetch(url("/api/separate"), {
-    method: "POST",
-    headers: { "Content-Type": "text/plain" },
-    body: JSON.stringify(req),
-  }).then((r) => json<{ job: string }>(r));
-  onJob(job);
-
+/** Acompanha uma tarefa do servidor (SSE) até o fim e devolve o resultado do evento "done". */
+function followJob<T>(job: string, h: Handlers): Promise<T> {
   return new Promise((resolve, reject) => {
     const es = new EventSource(url("/api/events", { job }));
     es.addEventListener("progress", (e) => h.onProgress(JSON.parse((e as MessageEvent).data)));
     es.addEventListener("status", (e) => h.onStatus(JSON.parse((e as MessageEvent).data)));
     es.addEventListener("done", (e) => {
       es.close();
-      resolve(JSON.parse((e as MessageEvent).data).stems);
+      resolve(JSON.parse((e as MessageEvent).data));
     });
     es.addEventListener("error", (e) => {
       const data = (e as MessageEvent).data;
@@ -100,6 +89,33 @@ export async function separate(
       reject(new Error(data ? JSON.parse(data) : "Conexão com o aplicativo perdida."));
     });
   });
+}
+
+const postJob = (path: string, body: unknown) =>
+  fetch(url(path), { method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) }).then((r) =>
+    json<{ job: string }>(r),
+  );
+
+/** Inicia a separação e acompanha o progresso até o fim. */
+export async function separate(
+  req: SeparateRequest,
+  h: Handlers,
+  onJob: (jobId: string) => void,
+): Promise<StemFile[]> {
+  const { job } = await postJob("/api/separate", req);
+  onJob(job);
+  return (await followJob<{ stems: StemFile[] }>(job, h)).stems;
+}
+
+/** Baixa o áudio de um vídeo do YouTube (feito pelo app) e devolve o id e a URL do WAV, como no upload. */
+export async function importYoutube(
+  link: string,
+  h: Handlers,
+  onJob: (jobId: string) => void,
+): Promise<{ id: string; name: string; wav: string }> {
+  const { job } = await postJob("/api/youtube", { url: link });
+  onJob(job);
+  return followJob(job, h);
 }
 
 export const cancelSeparation = (job: string) =>

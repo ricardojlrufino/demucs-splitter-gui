@@ -6,6 +6,7 @@ import type { Device, StemId } from "./lib/models";
 import {
   cancelSeparation,
   checkEnvironment,
+  importYoutube,
   loadAudio,
   loadSetting,
   saveSetting,
@@ -48,26 +49,59 @@ export function App() {
 
   useEffect(() => recheck(demucsPath), []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const acceptUpload = useCallback(
+    async (up: { id: string; name: string; wav: string }) => {
+      const buffer = await loadAudio(ctx, up.wav);
+      setFile({ id: up.id, name: up.name, buffer });
+      setSelection({ start: 0, end: buffer.duration });
+      setResult(null);
+      setSepError(null);
+      setTab("original");
+    },
+    [ctx],
+  );
+
   const openFile = useCallback(
     async (f: File) => {
       setLoadingFile(true);
       setFileError(null);
       try {
-        const up = await uploadAudio(f);
-        const buffer = await loadAudio(ctx, up.wav);
-        setFile({ id: up.id, name: up.name, buffer });
-        setSelection({ start: 0, end: buffer.duration });
-        setResult(null);
-        setSepError(null);
-        setTab("original");
+        await acceptUpload(await uploadAudio(f));
       } catch (e) {
         setFileError(errMsg(e));
       } finally {
         setLoadingFile(false);
       }
     },
-    [ctx],
+    [acceptUpload],
   );
+
+  const [ytUrl, setYtUrl] = useState("");
+  const [yt, setYt] = useState<{ percent: number; status: string } | null>(null);
+  const ytJob = useRef<string | null>(null);
+
+  const openYoutube = useCallback(async () => {
+    if (!ytUrl.trim() || yt) return;
+    setFileError(null);
+    setYt({ percent: 0, status: "Conectando…" });
+    try {
+      const up = await importYoutube(
+        ytUrl,
+        {
+          onProgress: (p) => setYt((y) => (y ? { ...y, percent: p.percent } : y)),
+          onStatus: (status) => setYt((y) => (y ? { ...y, status } : y)),
+        },
+        (id) => (ytJob.current = id),
+      );
+      await acceptUpload(up);
+      setYtUrl("");
+    } catch (e) {
+      setFileError(errMsg(e));
+    } finally {
+      ytJob.current = null;
+      setYt(null);
+    }
+  }, [ytUrl, yt, acceptUpload]);
 
   const fileInput = useRef<HTMLInputElement>(null);
   const jobRef = useRef<string | null>(null);
@@ -147,8 +181,31 @@ export function App() {
             />
             <div className="drop-title">{loadingFile ? "Preparando áudio…" : "Solte um arquivo de áudio aqui"}</div>
             <div className="muted">ou clique para escolher (MP3, WAV, FLAC, OGG, M4A…)</div>
-            {fileError && <div className="alert pre">{fileError}</div>}
           </div>
+
+          <div className="yt-row">
+            <input
+              type="url"
+              placeholder="Ou cole um link do YouTube"
+              value={ytUrl}
+              disabled={!!yt}
+              onChange={(e) => setYtUrl(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && openYoutube()}
+              aria-label="Link do YouTube"
+            />
+            {yt ? (
+              <button className="btn ghost" onClick={() => ytJob.current && cancelSeparation(ytJob.current)}>Cancelar</button>
+            ) : (
+              <button className="btn primary" disabled={!ytUrl.trim()} onClick={openYoutube}>Importar</button>
+            )}
+          </div>
+          {yt && (
+            <div className="yt-progress">
+              <div className="bar big"><div style={{ width: `${yt.percent}%` }} /></div>
+              <span className="mono muted">{yt.status} {yt.percent > 0 && yt.percent < 100 ? `${Math.round(yt.percent)}%` : ""}</span>
+            </div>
+          )}
+          {fileError && <div className="alert pre">{fileError}</div>}
         </>
       ) : (
         <>

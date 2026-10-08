@@ -20,7 +20,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 
-from . import audio, demucs
+from . import audio, demucs, youtube
 from .procs import kill_tree
 
 MAX_UPLOAD = 4 * 1024**3
@@ -92,6 +92,36 @@ class App:
         info = {"id": uid, "name": name, "wav": f"/media/{uid}/original.wav"}
         self.uploads[uid] = info
         return info
+
+    def start_youtube(self, url: str) -> str:
+        url = youtube.validate(url)
+        jid = uuid.uuid4().hex[:12]
+        job = Job()
+        self.jobs[jid] = job
+        threading.Thread(target=self._run_youtube, args=(job, url), daemon=True).start()
+        return jid
+
+    def _run_youtube(self, job: Job, url: str) -> None:
+        uid = uuid.uuid4().hex[:12]
+        folder = self.work / uid
+        try:
+            folder.mkdir()
+            job.emit("status", "Baixando o áudio do YouTube…")
+            title, src = youtube.download(
+                url, folder, lambda p: job.emit("progress", {"phase": "download", "percent": p}), lambda: job.cancelled
+            )
+            job.emit("status", "Convertendo o áudio…")
+            audio.to_wav(src, folder / "original.wav")
+            name = f"{_SAFE.sub('_', title).strip() or 'YouTube'}{src.suffix}"
+            src.unlink(missing_ok=True)
+            info = {"id": uid, "name": name, "wav": f"/media/{uid}/original.wav"}
+            self.uploads[uid] = info
+            job.emit("done", info)
+        except Exception as e:  # noqa: BLE001
+            shutil.rmtree(folder, ignore_errors=True)
+            job.emit("error", "Download cancelado." if job.cancelled else str(e))
+        finally:
+            job.done = True
 
     def start_job(self, req: dict) -> str:
         up = self.uploads.get(str(req.get("id", "")))
@@ -202,7 +232,9 @@ def make_handler(app: App):
                     self._json(app.add_upload(Path(name).name or "audio", self.rfile, length))
                     return
                 body = json.loads(self.rfile.read(length) or b"{}")
-                if path == "/api/separate":
+                if path == "/api/youtube":
+                    self._json({"job": app.start_youtube(str(body.get("url", "")))})
+                elif path == "/api/separate":
                     self._json({"job": app.start_job(body)})
                 elif path == "/api/cancel":
                     job = app.jobs.get(str(body.get("job")))
@@ -215,6 +247,8 @@ def make_handler(app: App):
                     self._json({"error": "não encontrado"}, 404)
             except (BrokenPipeError, ConnectionResetError):
                 pass
+            except ValueError as e:
+                self._json({"error": str(e)}, 400)
             except Exception as e:  # noqa: BLE001
                 self._json({"error": str(e)}, 500)
 

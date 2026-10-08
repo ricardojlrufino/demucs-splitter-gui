@@ -21,6 +21,8 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "webui2" },
+    { name = "yt-dlp", version = "2025.10.14", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
+    { name = "yt-dlp", version = "2026.8.19", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
 ]
 
 [package.dev-dependencies]
@@ -29,7 +31,10 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "webui2", specifier = "==2.5.8" }]
+requires-dist = [
+    { name = "webui2", specifier = "==2.5.8" },
+    { name = "yt-dlp", specifier = ">=2025.10.14" },
+]
 
 [package.metadata.requires-dev]
 dev = [{ name = "pyinstaller", specifier = ">=6" }]
@@ -159,6 +164,30 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/66/a4/d7db2bcf09002643fbef7e10f70c9a64abded7f324ba1762515d066f4bf7/webui2-2.5.8.tar.gz", hash = "sha256:520a4be7dac990111d25121e2fb37d18d28281801651814bd911ae85dd7b281f", size = 943851, upload-time = "2026-04-10T16:06:48.891Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/52/07/d004022f629bb8831b0a61df81eeba7405d9b08ea2235386fa58b6cd3e32/webui2-2.5.8-py3-none-any.whl", hash = "sha256:b3ed3878eda8b63ed4c7116c8b7c297d6df2825aec78bc296cd0ea0d018c982e", size = 948459, upload-time = "2026-04-10T16:06:47.652Z" },
+]
+
+[[package]]
+name = "yt-dlp"
+version = "2025.10.14"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version < '3.10'",
+]
+sdist = { url = "https://files.pythonhosted.org/packages/03/b7/dab729345e22891e79294273bc59c5213a1ec87331f49cb82ccea2b1bc9f/yt_dlp-2025.10.14.tar.gz", hash = "sha256:b18436aa9bb6f04354fd78d31ad9eeaae8c81b6a859f07072b25c18cd6c25844", size = 3045272, upload-time = "2025-10-14T23:39:52.688Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b0/19/399c85d29bd7b366b31ede82698f7963374e5a3842ae9de0cde6514506b0/yt_dlp-2025.10.14-py3-none-any.whl", hash = "sha256:0b9da17eda1bbf48e2315130043d7993fd4ca1c5a35571f8231da1a910c9c115", size = 3248664, upload-time = "2025-10-14T23:39:49.95Z" },
+]
+
+[[package]]
+name = "yt-dlp"
+version = "2026.8.19"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.10'",
+]
+sdist = { url = "https://files.pythonhosted.org/packages/1e/e0/832fa4ca334b766a06933a196066edc3dba37cdb6f14cd98d59bcc69a4b4/yt_dlp-2026.8.19.tar.gz", hash = "sha256:9e213e48cea35c66b378e4447903f118f6392a5fa380a2b6d7070ec86f4e0af1", size = 3052025, upload-time = "2026-08-19T23:48:59.291Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/69/b2/8cd1613f56eed7ceb64fbd4df3f1c01246bfb098e6f398228bafda22b80b/yt_dlp-2026.8.19-py3-none-any.whl", hash = "sha256:1d57897e94c6665a0a6f9bc54b34e584284e32c034ffab3a7df25d8f7b24eedf", size = 3185533, upload-time = "2026-08-19T23:48:56.925Z" },
 ]
 
 [[package]]

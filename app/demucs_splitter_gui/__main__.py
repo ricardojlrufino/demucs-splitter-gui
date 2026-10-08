@@ -59,8 +59,10 @@ def self_test() -> int:
         from webui import webui
 
         webui.Window()
+        import yt_dlp  # noqa: F401
+        from yt_dlp.extractor.youtube import YoutubeIE  # noqa: F401  (extratores são carregados sob demanda)
     except Exception as e:  # noqa: BLE001
-        print(f"FALHA: biblioteca do WebUI não carregou: {e}")
+        print(f"FALHA: dependência não carregou: {e}")
         return 1
     print("OK")
     return 0

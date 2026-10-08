@@ -3,7 +3,10 @@ name = "demucs-splitter-gui"
 version = "0.1.0"
 description = "Separação de áudio em pistas usando o Demucs instalado no computador"
 requires-python = ">=3.9"
-dependencies = ["webui2==2.5.8"]
+dependencies = [
+    "webui2==2.5.8",
+    "yt-dlp>=2025.10.14",
+]
 
 [dependency-groups]
 dev = ["pyinstaller>=6"]

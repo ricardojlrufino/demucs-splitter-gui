@@ -3,12 +3,21 @@
 App desktop para separar áudio em até 6 pistas (bateria, baixo, vocais, guitarra, piano e outros) usando o
 **Demucs já instalado no computador** (linha de comando).
 
-- Aba **1 · Original**: importar arquivo (seletor ou arrastar e soltar), waveform com player, selecionar um trecho,
+- Aba **1 · Original**: importar arquivo (seletor, arrastar e soltar ou **link do YouTube**), waveform com player, selecionar um trecho,
   escolher o modelo (Standard / 6-Stem / Fine-Tuned) e o dispositivo (Automático / CUDA / MPS / CPU).
 - Aba **2 · Pistas**: waveform por pista, mudo/solo/volume e download em WAV ou zip.
 
 O painel "Ambiente" mostra se o Demucs e o ffmpeg foram encontrados e se o PyTorch tem aceleração por GPU. Os
 modelos são baixados pelo próprio Demucs na primeira execução.
+
+## Importar do YouTube
+Cole o link na tela inicial e clique em "Importar": o app baixa o áudio e converte para uso. O download usa a biblioteca
+[yt-dlp](https://github.com/yt-dlp/yt-dlp), **embutida no pacote** (não precisa instalar nada). Aceita só links de
+`youtube.com` / `youtu.be`, sem playlists, lives ou vídeos com mais de 3 horas. Respeite os direitos autorais e os
+termos de uso do YouTube: use apenas conteúdo que você tem direito de baixar.
+
+O YouTube muda com frequência e o yt-dlp acompanha essas mudanças; se os downloads começarem a falhar, atualize o
+`yt-dlp` (`cd app && uv lock --upgrade-package yt-dlp`) e gere o pacote de novo.
 
 ## Como funciona
 Python + [WebUI](https://webui.me): a janela abre no Chrome/Edge/Firefox já instalado (modo app). Um servidor HTTP
