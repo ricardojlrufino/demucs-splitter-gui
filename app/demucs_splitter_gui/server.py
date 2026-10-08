@@ -45,7 +45,7 @@ class Job:
 class App:
     def __init__(self) -> None:
         self.token = secrets.token_urlsafe(24)
-        self.work = Path(tempfile.mkdtemp(prefix="stem-splitter-"))
+        self.work = Path(tempfile.mkdtemp(prefix="demucs-splitter-gui-"))
         self.uploads: dict[str, dict] = {}
         self.jobs: dict[str, Job] = {}
         self.lock = threading.Lock()
@@ -132,7 +132,7 @@ class App:
 def make_handler(app: App):
     class Handler(BaseHTTPRequestHandler):
         protocol_version = "HTTP/1.1"
-        server_version = "StemSplitter"
+        server_version = "DemucsSplitterGUI"
 
         def log_message(self, *a):  # silencioso
             pass

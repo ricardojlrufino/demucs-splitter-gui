@@ -40,7 +40,7 @@ def _patch_webui_loader() -> None:
 def cleanup_stale(max_age_hours: float = 6) -> None:
     """Remove pastas temporárias de execuções anteriores que foram encerradas à força."""
     cutoff = time.time() - max_age_hours * 3600
-    for d in Path(tempfile.gettempdir()).glob("stem-splitter-*"):
+    for d in Path(tempfile.gettempdir()).glob("demucs-splitter-gui-*"):
         try:
             if d.is_dir() and d.stat().st_mtime < cutoff:
                 shutil.rmtree(d, ignore_errors=True)
@@ -78,7 +78,7 @@ def main() -> int:
     app = App()
     app.start()
     # A interface é servida pelo WebUI a partir de uma cópia temporária, onde escrevemos a configuração da execução.
-    root = Path(tempfile.mkdtemp(prefix="stem-splitter-ui-"))
+    root = Path(tempfile.mkdtemp(prefix="demucs-splitter-gui-ui-"))
     shutil.copytree(ui, root, dirs_exist_ok=True)
     (root / "config.js").write_text(
         "window.__STEM_API__ = " + json.dumps({"base": f"http://127.0.0.1:{app.port}", "token": app.token}) + ";\n"

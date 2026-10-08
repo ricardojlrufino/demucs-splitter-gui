@@ -124,7 +124,7 @@ export function App() {
   return (
     <div className="app">
       <header>
-        <h1>Stem Splitter</h1>
+        <h1>Demucs Splitter GUI</h1>
         <p className="muted">Separação de áudio em até 6 pistas usando o Demucs instalado no computador</p>
       </header>
 

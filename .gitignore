@@ -1,6 +1,6 @@
 node_modules/
 web/dist/
-app/stem_splitter/ui/
+app/demucs_splitter_gui/ui/
 app/.venv/
 dist/
 build/

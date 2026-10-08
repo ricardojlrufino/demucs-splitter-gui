@@ -1,5 +1,5 @@
 [project]
-name = "stem-splitter"
+name = "demucs-splitter-gui"
 version = "0.1.0"
 description = "Separação de áudio em pistas usando o Demucs instalado no computador"
 requires-python = ">=3.9"
@@ -9,11 +9,11 @@ dependencies = ["webui2==2.5.8"]
 dev = ["pyinstaller>=6"]
 
 [project.scripts]
-stem-splitter = "stem_splitter.__main__:main"
+demucs-splitter-gui = "demucs_splitter_gui.__main__:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["stem_splitter"]
+packages = ["demucs_splitter_gui"]

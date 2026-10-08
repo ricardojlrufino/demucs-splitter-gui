@@ -10,7 +10,7 @@ declare global {
 const api = window.__STEM_API__;
 
 function url(path: string, params: Record<string, string> = {}): string {
-  if (!api) throw new Error("Esta interface precisa ser aberta pelo aplicativo Stem Splitter.");
+  if (!api) throw new Error("Esta interface precisa ser aberta pelo aplicativo Demucs Splitter GUI.");
   const q = new URLSearchParams({ ...params, t: api.token });
   return `${api.base}${path}?${q}`;
 }
@@ -129,6 +129,6 @@ const safe = <T,>(fn: () => T, fallback: T): T => {
 };
 
 export const loadSetting = (key: string, fallback: string) =>
-  safe(() => localStorage.getItem(`stem-splitter:${key}`) ?? fallback, fallback);
+  safe(() => localStorage.getItem(`demucs-splitter-gui:${key}`) ?? fallback, fallback);
 export const saveSetting = (key: string, value: string) =>
-  safe(() => localStorage.setItem(`stem-splitter:${key}`, value), undefined);
+  safe(() => localStorage.setItem(`demucs-splitter-gui:${key}`, value), undefined);

@@ -6,40 +6,40 @@ ui:
 
 # Abre o app (janela WebUI)
 run: ui
-	cd app && uv run stem-splitter
+	cd app && uv run demucs-splitter-gui
 
-# Gera o executável da plataforma atual em dist/stem-splitter
+# Gera o executável da plataforma atual em dist/demucs-splitter-gui
 package: ui
-	cd app && uv run pyinstaller --noconfirm --distpath ../dist stem-splitter.spec
+	cd app && uv run pyinstaller --noconfirm --distpath ../dist demucs-splitter-gui.spec
 
 # --- Instalação no Linux --------------------------------------------------------------------
 # Uso:  make package && sudo make install      (desinstalar: sudo make uninstall)
 # Outros destinos: PREFIX=/usr, PREFIX=$$HOME/.local (sem sudo) ou DESTDIR=/pasta (para empacotar).
 PREFIX  ?= /usr/local
-APPDIR   = $(DESTDIR)$(PREFIX)/lib/stem-splitter
+APPDIR   = $(DESTDIR)$(PREFIX)/lib/demucs-splitter-gui
 BINDIR   = $(DESTDIR)$(PREFIX)/bin
 DESKTOP  = $(DESTDIR)$(PREFIX)/share/applications
 ICONDIR  = $(DESTDIR)$(PREFIX)/share/icons/hicolor/scalable/apps
 
 install:
-	@test -x dist/stem-splitter/stem-splitter || { echo "Pacote não encontrado. Rode primeiro: make package"; exit 1; }
+	@test -x dist/demucs-splitter-gui/demucs-splitter-gui || { echo "Pacote não encontrado. Rode primeiro: make package"; exit 1; }
 	install -d $(APPDIR) $(BINDIR) $(DESKTOP) $(ICONDIR)
-	cp -R dist/stem-splitter/. $(APPDIR)/
+	cp -R dist/demucs-splitter-gui/. $(APPDIR)/
 	chmod -R u=rwX,go=rX $(APPDIR)
-	ln -sf $(PREFIX)/lib/stem-splitter/stem-splitter $(BINDIR)/stem-splitter
-	install -m 644 web/public/favicon.svg $(ICONDIR)/stem-splitter.svg
+	ln -sf $(PREFIX)/lib/demucs-splitter-gui/demucs-splitter-gui $(BINDIR)/demucs-splitter-gui
+	install -m 644 web/public/favicon.svg $(ICONDIR)/demucs-splitter-gui.svg
 	printf '%s\n' \
-	  '[Desktop Entry]' 'Type=Application' 'Name=Stem Splitter' \
+	  '[Desktop Entry]' 'Type=Application' 'Name=Demucs Splitter GUI' \
 	  'Comment=Separação de áudio em pistas com o Demucs' \
-	  'Exec=$(PREFIX)/bin/stem-splitter' 'Icon=stem-splitter' \
-	  'Categories=AudioVideo;Audio;' 'Terminal=false' 'StartupWMClass=stem-splitter' \
-	  > $(DESKTOP)/stem-splitter.desktop
-	chmod 644 $(DESKTOP)/stem-splitter.desktop
+	  'Exec=$(PREFIX)/bin/demucs-splitter-gui' 'Icon=demucs-splitter-gui' \
+	  'Categories=AudioVideo;Audio;' 'Terminal=false' 'StartupWMClass=demucs-splitter-gui' \
+	  > $(DESKTOP)/demucs-splitter-gui.desktop
+	chmod 644 $(DESKTOP)/demucs-splitter-gui.desktop
 	@[ -n "$(DESTDIR)" ] || { update-desktop-database $(DESKTOP) 2>/dev/null; gtk-update-icon-cache -q -t $(PREFIX)/share/icons/hicolor 2>/dev/null; true; }
-	@echo "Instalado em $(PREFIX). Abra pelo menu de aplicativos ou com: stem-splitter"
+	@echo "Instalado em $(PREFIX). Abra pelo menu de aplicativos ou com: demucs-splitter-gui"
 
 uninstall:
 	rm -rf $(APPDIR)
-	rm -f $(BINDIR)/stem-splitter $(DESKTOP)/stem-splitter.desktop $(ICONDIR)/stem-splitter.svg
+	rm -f $(BINDIR)/demucs-splitter-gui $(DESKTOP)/demucs-splitter-gui.desktop $(ICONDIR)/demucs-splitter-gui.svg
 	@[ -n "$(DESTDIR)" ] || { update-desktop-database $(DESKTOP) 2>/dev/null; true; }
 	@echo "Removido de $(PREFIX)."

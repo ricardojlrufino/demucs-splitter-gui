@@ -1,4 +1,4 @@
-# Stem Splitter
+# Demucs Splitter GUI
 
 App desktop para separar áudio em até 6 pistas (bateria, baixo, vocais, guitarra, piano e outros) usando o
 **Demucs já instalado no computador** (linha de comando).
@@ -14,7 +14,7 @@ modelos são baixados pelo próprio Demucs na primeira execução.
 Python + [WebUI](https://webui.me): a janela abre no Chrome/Edge/Firefox já instalado (modo app). Um servidor HTTP
 local (só `127.0.0.1`, protegido por token aleatório a cada execução) faz o trabalho: converte o áudio com ffmpeg,
 executa o `demucs` e envia o progresso à interface. A interface (React) fica em `web/` e é compilada para
-`app/stem_splitter/ui`.
+`app/demucs_splitter_gui/ui`.
 
 ## Requisitos para usar
 - [Demucs](https://github.com/adefossez/demucs) instalado (ex.: `pipx install demucs`) e `ffmpeg`, ambos no PATH.
@@ -32,8 +32,8 @@ executa o `demucs` e envia o progresso à interface. A interface (React) fica em
 
 2. **Baixar os fontes**
 
-       git clone <url-do-repositório> stem-splitter
-       cd stem-splitter
+       git clone <url-do-repositório> demucs-splitter-gui
+       cd demucs-splitter-gui
 
 3. **Gerar o pacote** (como usuário comum, sem `sudo`; compila a interface e empacota com o PyInstaller)
 
@@ -43,14 +43,14 @@ executa o `demucs` e envia o progresso à interface. A interface (React) fica em
 
        sudo make install
 
-   Instala em `/usr/local`: app em `lib/stem-splitter`, comando `stem-splitter` em `bin`, atalho no menu de
+   Instala em `/usr/local`: app em `lib/demucs-splitter-gui`, comando `demucs-splitter-gui` em `bin`, atalho no menu de
    aplicativos e ícone. Para outro destino use `PREFIX`:
 
        sudo make install PREFIX=/usr              # junto dos programas da distribuição
        make install PREFIX=$HOME/.local           # só para o seu usuário, sem sudo
        make install DESTDIR=/tmp/pkg              # monta uma árvore para criar pacotes
 
-5. **Abrir**: pelo menu de aplicativos ("Stem Splitter") ou no terminal com `stem-splitter`.
+5. **Abrir**: pelo menu de aplicativos ("Demucs Splitter GUI") ou no terminal com `demucs-splitter-gui`.
 
 6. **Desinstalar** (use o mesmo `PREFIX` da instalação)
 
@@ -67,15 +67,15 @@ Atualizar é repetir os passos 3 e 4 com os fontes novos.
 
 O auto-teste do pacote (usado na CI) confere a interface embutida e a biblioteca do WebUI, sem abrir janela:
 
-    dist/stem-splitter/stem-splitter --self-test
+    dist/demucs-splitter-gui/demucs-splitter-gui --self-test
 
 ## Windows e macOS
 O PyInstaller não faz cross-compile: o pacote de cada sistema é gerado no próprio sistema. A pipeline abaixo faz
-isso e publica um `.zip` por sistema; basta descompactar e executar `stem-splitter`.
+isso e publica um `.zip` por sistema; basta descompactar e executar `demucs-splitter-gui`.
 
 ## Pipeline (GitHub Actions)
 `.github/workflows/build.yml` compila a interface, empacota com PyInstaller e roda `--self-test` em Linux x64,
-Windows x64, macOS arm64 e macOS x64. Cada job publica um artefato (`stem-splitter-<sistema>.tar.gz|zip`); ao
+Windows x64, macOS arm64 e macOS x64. Cada job publica um artefato (`demucs-splitter-gui-<sistema>.tar.gz|zip`); ao
 enviar uma tag `v*` (ex.: `git tag v0.1.0 && git push --tags`) os pacotes são anexados a um Release.
 
 Os pacotes não são assinados: o macOS pede "Abrir mesmo assim" (Ajustes > Privacidade e Segurança) e o

@@ -1,11 +1,11 @@
 {
-  "name": "stem-splitter-online",
+  "name": "demucs-splitter-gui-web",
   "private": true,
   "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build --outDir ../app/stem_splitter/ui --emptyOutDir",
+    "build": "tsc -b && vite build --outDir ../app/demucs_splitter_gui/ui --emptyOutDir",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -58,27 +58,27 @@ jobs:
 
       - name: Empacotar (PyInstaller)
         working-directory: app
-        run: uv run pyinstaller --noconfirm --distpath ../dist --workpath ../build stem-splitter.spec
+        run: uv run pyinstaller --noconfirm --distpath ../dist --workpath ../build demucs-splitter-gui.spec
 
       - name: Auto-teste do pacote (interface + biblioteca do WebUI)
         run: |
-          if [ "$RUNNER_OS" = "Windows" ]; then exe=dist/stem-splitter/stem-splitter.exe; else exe=dist/stem-splitter/stem-splitter; fi
+          if [ "$RUNNER_OS" = "Windows" ]; then exe=dist/demucs-splitter-gui/demucs-splitter-gui.exe; else exe=dist/demucs-splitter-gui/demucs-splitter-gui; fi
           "$exe" --self-test
 
       - name: Compactar
         run: |
-          name="stem-splitter-${{ matrix.name }}"
+          name="demucs-splitter-gui-${{ matrix.name }}"
           case "$RUNNER_OS" in
-            Linux)   tar -czf "$name.tar.gz" -C dist stem-splitter ;;
-            macOS)   ditto -c -k --keepParent dist/stem-splitter "$name.zip" ;;  # preserva permissões de execução
-            Windows) 7z a -tzip "$name.zip" ./dist/stem-splitter > /dev/null ;;
+            Linux)   tar -czf "$name.tar.gz" -C dist demucs-splitter-gui ;;
+            macOS)   ditto -c -k --keepParent dist/demucs-splitter-gui "$name.zip" ;;  # preserva permissões de execução
+            Windows) 7z a -tzip "$name.zip" ./dist/demucs-splitter-gui > /dev/null ;;
           esac
           ls -lh "$name".*
 
       - uses: actions/upload-artifact@v4
         with:
-          name: stem-splitter-${{ matrix.name }}
-          path: stem-splitter-${{ matrix.name }}.${{ matrix.ext }}
+          name: demucs-splitter-gui-${{ matrix.name }}
+          path: demucs-splitter-gui-${{ matrix.name }}.${{ matrix.ext }}
           if-no-files-found: error
 
   release:
