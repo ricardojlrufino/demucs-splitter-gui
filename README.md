@@ -29,7 +29,7 @@ Funcionam nas abas Original e Pistas (exceto enquanto digita ou com o diálogo d
 | --- | --- |
 | `Espaço` | tocar / pausar |
 | `Home` | voltar ao início (início do trecho selecionado, se houver) |
-| `←` / `→` | voltar / avançar 5 s (com `Shift`, 1 s) |
+| `←` / `→` | voltar / avançar 1 s (com `Shift`, 5 s) |
 
 A interface se adapta a janelas estreitas e telas de toque (alças de seleção maiores).
 
