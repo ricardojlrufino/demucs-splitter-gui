@@ -22,7 +22,11 @@ export function ProgressDialog({ busy, modelLabel, duration, onCancel }: Props) 
 
   useEffect(() => {
     const d = ref.current;
-    if (d && !d.open) d.showModal();
+    if (d && !d.open) {
+      d.showModal();
+      // O foco automático cairia no botão "Cancelar": Espaço/Enter cancelariam sem querer. Foca o diálogo.
+      d.focus();
+    }
     return () => d?.close();
   }, []);
 
@@ -43,6 +47,7 @@ export function ProgressDialog({ busy, modelLabel, duration, onCancel }: Props) 
       ref={ref}
       className="progress-dialog"
       aria-labelledby="pd-title"
+      tabIndex={-1}
       onCancel={(e) => e.preventDefault()} // Esc não fecha: use o botão Cancelar
     >
       <h2 id="pd-title">{title}</h2>

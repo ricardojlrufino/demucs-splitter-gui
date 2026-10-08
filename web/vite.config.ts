@@ -6,9 +6,10 @@ import react from "@vitejs/plugin-react";
 /**
  * Em desenvolvimento (`make dev`) não há o launcher do WebUI para escrever o config.js: este plugin o serve
  * a partir do arquivo que a API local (`--api-only`) escreve com a porta e o token da execução.
+ * `DEV_API_CONFIG` e `DEV_PORT` permitem rodar mais de uma instância em paralelo.
  */
 function devApiConfig(): Plugin {
-  const file = resolve(__dirname, "../.dev-api.json");
+  const file = process.env.DEV_API_CONFIG ?? resolve(__dirname, "../.dev-api.json");
   return {
     name: "dev-api-config",
     configureServer(server) {
@@ -30,5 +31,5 @@ function devApiConfig(): Plugin {
 export default defineConfig({
   base: "./",
   plugins: [react(), devApiConfig()],
-  server: { port: 1420, strictPort: true },
+  server: { port: Number(process.env.DEV_PORT ?? 1420), strictPort: true },
 });

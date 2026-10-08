@@ -3,6 +3,7 @@ import { Transport } from "./Transport";
 import { EnvPanel } from "./EnvPanel";
 import { ProgressDialog, type BusyState } from "./ProgressDialog";
 import { usePlayer } from "../hooks/usePlayer";
+import { useShortcuts } from "../hooks/useShortcuts";
 import { formatTime } from "../dsp/wav";
 import type { Range } from "../audio/player";
 import { MODELS, type Device } from "../lib/models";
@@ -32,6 +33,7 @@ interface Props {
 
 export function OriginalTab(p: Props) {
   const pl = usePlayer(p.ctx, p.buffers, p.selection);
+  useShortcuts(pl);
   const model = MODELS.find((m) => m.id === p.modelId)!;
   const dur = p.selection.end - p.selection.start;
   const isFull = p.selection.start <= 0.001 && p.selection.end >= p.buffer.duration - 0.001;
@@ -60,6 +62,7 @@ export function OriginalTab(p: Props) {
         <p className="hint">
           Arraste na waveform para selecionar um trecho. Puxe a alça verde (início) ou vermelha (fim) para ajustar,
           arraste o miolo para mover o trecho, clique para posicionar o cursor.
+          Atalhos: <kbd>Espaço</kbd> tocar/pausar · <kbd>Home</kbd> início · <kbd>←</kbd> <kbd>→</kbd> voltar/avançar 1 s (<kbd>Shift</kbd> 5 s).
         </p>
         <Transport
           playing={pl.playing}

@@ -30,6 +30,8 @@ export interface Environment {
   torch: string | null;
   cuda: boolean | null;
   mps: boolean | null;
+  /** Formatos de exportação disponíveis, do melhor para o mais compatível (ex.: ["ogg","mp3","wav"]). */
+  formats: string[];
 }
 
 export interface StemFile {
@@ -131,10 +133,11 @@ function triggerDownload(href: string) {
   a.remove();
 }
 
-export const downloadStem = (path: string, fileName: string) => triggerDownload(url(path, { download: fileName }));
+export const downloadStem = (path: string, fileName: string, format: string) =>
+  triggerDownload(url(path, { download: fileName, format }));
 
-export const downloadZip = (paths: string[], baseName: string) =>
-  triggerDownload(url("/api/zip", { urls: paths.join(","), base: baseName }));
+export const downloadZip = (paths: string[], baseName: string, format: string) =>
+  triggerDownload(url("/api/zip", { urls: paths.join(","), base: baseName, format }));
 
 const safe = <T,>(fn: () => T, fallback: T): T => {
   try {

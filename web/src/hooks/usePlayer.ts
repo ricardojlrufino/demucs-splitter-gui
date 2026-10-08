@@ -9,9 +9,11 @@ export function usePlayer(ctx: AudioContext, buffers: AudioBuffer[], range: Rang
   const [time, setTime] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [loop, setLoopState] = useState(false);
+  const [duration, setDuration] = useState(0);
 
   useEffect(() => {
     player.setTracks(buffers);
+    setDuration(player.duration);
     setTime(0);
     setPlaying(false);
   }, [player, buffers]);
@@ -70,5 +72,7 @@ export function usePlayer(ctx: AudioContext, buffers: AudioBuffer[], range: Rang
     [player],
   );
 
-  return { player, time, playing, loop, toggle, stop, seek, skip, setLoop, duration: player.duration };
+  const homeTime = useCallback(() => player.range?.start ?? 0, [player]);
+
+  return { player, time, playing, loop, toggle, stop, seek, skip, setLoop, homeTime, duration };
 }

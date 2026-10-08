@@ -10,6 +10,7 @@ import threading
 from pathlib import Path
 from typing import Callable
 
+from . import audio
 from .procs import IS_WINDOWS, find_ffmpeg, kill_tree, popen_kwargs, run
 
 MODELS = ("htdemucs", "htdemucs_6s", "htdemucs_ft")
@@ -83,7 +84,7 @@ def gpu_env(python: str | None) -> dict[str, str]:
 def environment(custom: str | None) -> dict:
     ffmpeg = find_ffmpeg()
     demucs = find_demucs(custom)
-    info = {"demucs": demucs, "ffmpeg": ffmpeg, "torch": None, "cuda": None, "mps": None}
+    info = {"demucs": demucs, "ffmpeg": ffmpeg, "torch": None, "cuda": None, "mps": None, "formats": audio.available_formats()}
     if demucs:
         py = python_of(demucs)
         probed = probe_torch(py) if py else None

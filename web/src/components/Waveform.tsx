@@ -15,6 +15,8 @@ interface Props {
 }
 
 const EDGE_PX = 8;
+const EDGE_PX_TOUCH = 16;
+const MIN_TAG_PX = 130; // abaixo disso as etiquetas de tempo das alças se sobrepõem
 const MIN_SEL = 0.5;
 
 export function Waveform({ buffer, color, height = 120, time, onSeek, selection, onSelect }: Props) {
@@ -86,10 +88,11 @@ export function Waveform({ buffer, color, height = 120, time, onSeek, selection,
     const rect = wrapRef.current!.getBoundingClientRect();
     const sx = rect.left + (selection.start / duration) * rect.width;
     const ex = rect.left + (selection.end / duration) * rect.width;
+    const edge = window.matchMedia("(pointer: coarse)").matches ? EDGE_PX_TOUCH : EDGE_PX;
     const ds = Math.abs(clientX - sx);
     const de = Math.abs(clientX - ex);
-    if (ds <= EDGE_PX && ds <= de) return "start";
-    if (de <= EDGE_PX) return "end";
+    if (ds <= edge && ds <= de) return "start";
+    if (de <= edge) return "end";
     if (clientX > sx && clientX < ex) return "move";
     return "new";
   };
@@ -142,6 +145,7 @@ export function Waveform({ buffer, color, height = 120, time, onSeek, selection,
     : mode === "move" ? (active === "move" ? "grabbing" : "grab")
     : "crosshair";
   const pct = (t: number) => `${(t / duration) * 100}%`;
+  const showTags = selection ? ((selection.end - selection.start) / duration) * width >= MIN_TAG_PX : false;
 
   return (
     <div
@@ -165,14 +169,14 @@ export function Waveform({ buffer, color, height = 120, time, onSeek, selection,
             style={{ left: pct(selection.start) }}
           >
             <span className="grip"></span>
-            <span className="tag mono">{formatTime(selection.start)}</span>
+            {showTags && <span className="tag mono">{formatTime(selection.start)}</span>}
           </div>
           <div
             className={`handle end${mode === "end" ? " hot" : ""}`}
             style={{ left: pct(selection.end) }}
           >
             <span className="grip"></span>
-            <span className="tag mono">{formatTime(selection.end)}</span>
+            {showTags && <span className="tag mono">{formatTime(selection.end)}</span>}
           </div>
         </>
       )}

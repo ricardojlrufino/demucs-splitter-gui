@@ -10,6 +10,18 @@ App desktop para separar áudio em até 6 pistas (bateria, baixo, vocais, guitar
 O painel "Ambiente" mostra se o Demucs e o ffmpeg foram encontrados e se o PyTorch tem aceleração por GPU. Os
 modelos são baixados pelo próprio Demucs na primeira execução.
 
+## Exportar as pistas
+Na aba **Pistas**, escolha o **Formato** e baixe cada pista (⬇) ou todas de uma vez em um `.zip`:
+
+| Formato | Qualidade |
+| --- | --- |
+| **OGG Vorbis** (padrão) | Máxima (q10, ~500 kbps VBR). Melhor qualidade entre os formatos com compressão. |
+| MP3 (V0) | Alta (~245 kbps VBR), toca em qualquer aparelho e programa. |
+| WAV | Sem perdas, arquivos grandes. |
+
+OGG e MP3 dependem do `ffmpeg` ter os codificadores `libvorbis` e `libmp3lame` (a maioria das instalações tem);
+só os formatos disponíveis aparecem na lista. A escolha fica salva para a próxima vez.
+
 ## Importar do YouTube
 Em vez de abrir um arquivo, você pode colar o link de um vídeo do YouTube na tela inicial:
 

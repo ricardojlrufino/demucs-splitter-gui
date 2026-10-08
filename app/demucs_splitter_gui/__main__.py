@@ -120,7 +120,7 @@ def main() -> int:
         window = webui.Window()
         window.set_root_folder(str(root))
         window.set_size(1100, 820)
-        window.set_minimum_size(720, 560)
+        window.set_minimum_size(360, 520)
         if not window.show("index.html"):
             raise RuntimeError("não foi possível abrir uma janela")
         webui.wait()

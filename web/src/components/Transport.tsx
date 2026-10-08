@@ -16,12 +16,12 @@ interface Props {
 export function Transport({ playing, time, duration, loop, onToggle, onStop, onSkip, onLoop, children }: Props) {
   return (
     <div className="transport">
-      <button className="icon-btn" title="Voltar 5s" onClick={() => onSkip(-5)}><BackIcon /></button>
-      <button className="icon-btn primary" title={playing ? "Pausar" : "Tocar"} onClick={onToggle}>
+      <button className="icon-btn" title="Voltar 5 s (Shift+←)" onClick={() => onSkip(-5)}><BackIcon /></button>
+      <button className="icon-btn primary" title={playing ? "Pausar (Espaço)" : "Tocar (Espaço)"} onClick={onToggle}>
         {playing ? <PauseIcon /> : <PlayIcon />}
       </button>
       <button className="icon-btn" title="Parar" onClick={onStop}><StopIcon /></button>
-      <button className="icon-btn" title="Avançar 5s" onClick={() => onSkip(5)}><ForwardIcon /></button>
+      <button className="icon-btn" title="Avançar 5 s (Shift+→)" onClick={() => onSkip(5)}><ForwardIcon /></button>
       <button className={`icon-btn${loop ? " active" : ""}`} title="Repetir" onClick={() => onLoop(!loop)}><LoopIcon /></button>
       <span className="time mono">
         {formatTime(time)} / {formatTime(duration)}

@@ -210,7 +210,7 @@ def make_handler(app: App):
                 elif path == "/api/zip":
                     self._zip(q)
                 elif path.startswith("/media/"):
-                    self._media(path, q.get("download"))
+                    self._media(path, q.get("download"), q.get("format"))
                 else:
                     self._json({"error": "não encontrado"}, 404)
             except (BrokenPipeError, ConnectionResetError):
@@ -283,10 +283,20 @@ def make_handler(app: App):
             target = (app.work / rel).resolve()
             return target if target.is_file() and app.work.resolve() in target.parents else None
 
-        def _media(self, path: str, download: str | None) -> None:
+        def _converted(self, f: Path, fmt: str | None) -> Path:
+            """Versão do arquivo no formato pedido (ogg/mp3), convertida uma vez e guardada ao lado do WAV."""
+            if not fmt or fmt == "wav":
+                return f
+            target = f.with_suffix("." + fmt)
+            if not target.exists():
+                audio.encode(f, target, fmt)
+            return target
+
+        def _media(self, path: str, download: str | None, fmt: str | None = None) -> None:
             f = self._resolve(unquote(path[len("/media/"):]))
             if not f:
                 return self._json({"error": "arquivo não encontrado"}, 404)
+            f = self._converted(f, fmt)
             size = f.stat().st_size
             start, end, status = 0, size - 1, 200
             m = re.match(r"bytes=(\d*)-(\d*)", self.headers.get("Range", ""))
@@ -320,10 +330,12 @@ def make_handler(app: App):
             files = [self._resolve(unquote(u.removeprefix("/media/"))) for u in q.get("urls", "").split(",") if u]
             if not files or not all(files):
                 return self._json({"error": "arquivos inválidos"}, 400)
+            fmt = q.get("format") or "wav"
             tmp = app.work / f"zip-{uuid.uuid4().hex[:8]}.zip"
+            # Áudio já comprimido não encolhe no zip; WAV também é guardado sem compressão (mais rápido)
             with zipfile.ZipFile(tmp, "w", zipfile.ZIP_STORED) as z:
                 for f in files:
-                    z.write(f, f"{_SAFE.sub('_', base)} - {f.stem}.wav")
+                    z.write(self._converted(f, fmt), f"{_SAFE.sub('_', base)} - {f.stem}.{fmt}")
             try:
                 size = tmp.stat().st_size
                 self.send_response(200)

@@ -250,7 +250,13 @@ export function App() {
               }}
             />
           ) : (
-            <StemsTab ctx={ctx} baseName={result.baseName} stems={result.stems} offset={result.offset} />
+            <StemsTab
+              ctx={ctx}
+              baseName={result.baseName}
+              stems={result.stems}
+              offset={result.offset}
+              formats={env?.formats?.length ? env.formats : ["wav"]}
+            />
           )}
         </>
       )}

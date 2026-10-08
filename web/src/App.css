@@ -183,3 +183,53 @@ select, .env-path input { background: var(--panel-2); color: var(--text); border
 .yt-row input { flex: 1; background: var(--panel-2); color: var(--text); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; font: inherit; min-width: 0; }
 .yt-row input:focus { outline: none; border-color: var(--accent); }
 .yt-progress { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+
+kbd { font-family: "JetBrains Mono", monospace; font-size: 0.75em; background: var(--panel-2); border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; color: var(--text); }
+
+/* ---------- Responsivo ---------- */
+.btn { white-space: normal; }
+.models { grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); }
+.env-path { flex-wrap: wrap; }
+.env-path input { min-width: 0; flex: 1 1 220px; }
+.yt-row input { flex: 1 1 200px; }
+.yt-row { flex-wrap: wrap; }
+.gpu-warn .mono, .gpu-warn p.mono { overflow-wrap: anywhere; }
+.file-row > div:first-child { min-width: 0; }
+
+@media (max-width: 720px) {
+  .app { padding: 16px 12px 48px; }
+  header h1 { font-size: 1.6rem; }
+  header p { margin-bottom: 16px; }
+  .dropzone { padding: 44px 16px; }
+  .drop-title { font-size: 1.1rem; }
+  .tabs button { padding: 10px 12px; }
+  .panel { padding: 10px; }
+  .env-row > span:first-child { min-width: 0; }
+  .env .device { margin-left: 0; width: 100%; justify-content: space-between; }
+  .transport { gap: 4px; }
+  .transport .time { margin-left: 4px; }
+  .transport .spacer { flex-basis: 100%; height: 0; }
+  .stem-head { gap: 8px; }
+  .stem-label { min-width: 0; flex: 1 1 auto; }
+  .stem-head input[type="range"] { flex: 1 1 100%; width: auto; order: 5; }
+  .action-row .btn { width: 100%; }
+  .progress-dialog { padding: 18px; }
+}
+
+@media (max-width: 420px) {
+  .icon-btn { width: 36px; height: 36px; }
+  .icon-btn.primary { width: 42px; height: 42px; }
+  .sel-info { flex-wrap: wrap; gap: 6px; }
+  .file-row { flex-direction: column; align-items: stretch; }
+  .yt-row .btn { flex: 1 1 100%; }
+  .pd-stats { flex-wrap: wrap; }
+}
+
+@media (pointer: coarse) {
+  .sq { width: 38px; height: 36px; }
+  .link { padding: 6px 0; }
+}
+.progress-dialog:focus { outline: none; }
+
+.transport .format { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 0.85rem; flex-wrap: wrap; }
+@media (max-width: 720px) { .transport .format { width: 100%; justify-content: space-between; } .transport .format select { flex: 1; min-width: 0; } }
