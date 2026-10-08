@@ -12,19 +12,19 @@ export const MODELS: readonly ModelVariant[] = [
   {
     id: "htdemucs",
     label: "Standard",
-    description: "4 pistas",
+    description: "4 pistas: bateria, baixo, vocais e outros",
     stems: ["drums", "bass", "other", "vocals"],
   },
   {
     id: "htdemucs_6s",
     label: "6-Stem",
-    description: "6 pistas, com guitarra e piano",
+    description: "6 pistas: bateria, baixo, vocais, guitarra, piano e outros",
     stems: ["drums", "bass", "other", "vocals", "guitar", "piano"],
   },
   {
     id: "htdemucs_ft",
     label: "Fine-Tuned",
-    description: "4 pistas, melhor qualidade (mais lento)",
+    description: "4 pistas (as mesmas do Standard), com melhor qualidade e bem mais lento",
     stems: ["drums", "bass", "other", "vocals"],
   },
 ];

@@ -5,7 +5,7 @@ import { ProgressDialog, type BusyState } from "./ProgressDialog";
 import { usePlayer } from "../hooks/usePlayer";
 import { formatTime } from "../dsp/wav";
 import type { Range } from "../audio/player";
-import { MODELS, STEM_LABELS, type Device, type StemId } from "../lib/models";
+import { MODELS, type Device } from "../lib/models";
 import type { Environment } from "../lib/backend";
 
 interface Props {
@@ -17,8 +17,6 @@ interface Props {
   onSelect: (r: Range | null) => void;
   modelId: string;
   onModelChange: (id: string) => void;
-  stems: StemId[];
-  onStemsChange: (s: StemId[]) => void;
   env: Environment | null;
   device: Device;
   onDeviceChange: (d: Device) => void;
@@ -37,10 +35,7 @@ export function OriginalTab(p: Props) {
   const model = MODELS.find((m) => m.id === p.modelId)!;
   const dur = p.selection.end - p.selection.start;
   const isFull = p.selection.start <= 0.001 && p.selection.end >= p.buffer.duration - 0.001;
-  const canRun = !!p.env?.demucs && !!p.env?.ffmpeg && p.stems.length > 0;
-
-  const toggleStem = (s: StemId) =>
-    p.onStemsChange(p.stems.includes(s) ? p.stems.filter((x) => x !== s) : [...p.stems, s]);
+  const canRun = !!p.env?.demucs && !!p.env?.ffmpeg;
 
   return (
     <div className="tab-body">
@@ -98,16 +93,6 @@ export function OriginalTab(p: Props) {
             <div className="model-name">{m.label}</div>
             <div className="model-desc">{m.description}</div>
           </div>
-        ))}
-      </div>
-
-      <h3 className="section-title">Pistas a manter</h3>
-      <div className="stem-chips">
-        {model.stems.map((s) => (
-          <label key={s} className={`chip stem-${s}${p.stems.includes(s) ? " on" : ""}`}>
-            <input type="checkbox" checked={p.stems.includes(s)} onChange={() => toggleStem(s)} />
-            {STEM_LABELS[s]}
-          </label>
         ))}
       </div>
 

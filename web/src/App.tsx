@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { OriginalTab } from "./components/OriginalTab";
 import { StemsTab, type StemResult } from "./components/StemsTab";
 import type { Range } from "./audio/player";
-import { MODELS, type Device, type StemId } from "./lib/models";
+import type { Device, StemId } from "./lib/models";
 import {
   cancelSeparation,
   checkEnvironment,
@@ -32,7 +32,6 @@ export function App() {
   const [selection, setSelection] = useState<Range>({ start: 0, end: 0 });
 
   const [modelId, setModelId] = useState("htdemucs_6s");
-  const [stems, setStems] = useState<StemId[]>([...MODELS[1].stems]);
   const [tab, setTab] = useState<Tab>("original");
   const [busy, setBusy] = useState<Busy | null>(null);
   const [sepError, setSepError] = useState<string | null>(null);
@@ -48,11 +47,6 @@ export function App() {
   );
 
   useEffect(() => recheck(demucsPath), []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const changeModel = (id: string) => {
-    setModelId(id);
-    setStems([...MODELS.find((m) => m.id === id)!.stems]);
-  };
 
   const openFile = useCallback(
     async (f: File) => {
@@ -104,9 +98,8 @@ export function App() {
         },
         (id) => (jobRef.current = id),
       );
-      const wanted = files.filter((s) => stems.includes(s.name as StemId));
       const loaded: StemResult[] = await Promise.all(
-        wanted.map(async (s) => ({ name: s.name as StemId, path: s.url, buffer: await loadAudio(ctx, s.url) })),
+        files.map(async (s) => ({ name: s.name as StemId, path: s.url, buffer: await loadAudio(ctx, s.url) })),
       );
       setResult({ stems: loaded, offset: full ? 0 : selection.start, baseName: file.name.replace(/\.[^.]+$/, "") });
       setTab("stems");
@@ -117,7 +110,7 @@ export function App() {
       jobRef.current = null;
       setBusy(null);
     }
-  }, [file, selection, modelId, device, demucsPath, stems, ctx]);
+  }, [file, selection, modelId, device, demucsPath, ctx]);
 
   const originalBuffers = useMemo(() => (file ? [file.buffer] : []), [file]);
 
@@ -177,9 +170,7 @@ export function App() {
               selection={selection}
               onSelect={(r) => setSelection(r ?? { start: 0, end: file.buffer.duration })}
               modelId={modelId}
-              onModelChange={changeModel}
-              stems={stems}
-              onStemsChange={setStems}
+              onModelChange={setModelId}
               env={env}
               device={device}
               onDeviceChange={(d) => {
