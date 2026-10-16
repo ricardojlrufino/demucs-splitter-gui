@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Waveform } from "./Waveform";
 import { Transport } from "./Transport";
 import { EnvPanel } from "./EnvPanel";
@@ -38,6 +39,7 @@ interface Props {
 export function OriginalTab(p: Props) {
   const pl = usePlayer(p.ctx, p.buffers, p.selection);
   const [format, setFormat] = useExportFormat(p.formats);
+  const [dlMsg, setDlMsg] = useState<string | null>(null);
   useShortcuts(pl);
   const model = MODELS.find((m) => m.id === p.modelId)!;
   const dur = p.selection.end - p.selection.start;
@@ -63,11 +65,15 @@ export function OriginalTab(p: Props) {
             onClick={() => {
               const base = p.fileName.replace(/\.[^.]+$/, "");
               const tag = isFull ? "" : rangeTag(p.selection.start, p.selection.end);
-              downloadStem(p.downloadable!.wav, `${base}${tag}.${extOf(format)}`, format, isFull ? null : p.selection);
+              setDlMsg("Preparando o download…");
+              downloadStem(p.downloadable!.wav, `${base}${tag}.${extOf(format)}`, format, isFull ? null : p.selection)
+                .then(() => setDlMsg("Áudio baixado."))
+                .catch((e) => setDlMsg(`Falha ao baixar: ${e.message}`));
             }}
           >
             {isFull ? "Baixar áudio" : "Baixar trecho selecionado"}
           </button>
+          {dlMsg && <span className="muted">{dlMsg}</span>}
         </div>
       )}
 

@@ -16,6 +16,7 @@ import threading
 import time
 import uuid
 import zipfile
+from concurrent.futures import ThreadPoolExecutor
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
@@ -351,11 +352,14 @@ def make_handler(app: App):
                 return self._json({"error": "arquivos inválidos"}, 400)
             fmt = q.get("format") or "wav"
             rng = self._range(q)
+            # Cada pista é um ffmpeg independente: converte todas ao mesmo tempo (o ffmpeg é quase todo single-thread)
+            with ThreadPoolExecutor(max_workers=min(len(files), 8)) as pool:
+                converted = list(pool.map(lambda f: self._converted(f, fmt, rng), files))
             tmp = app.work / f"zip-{uuid.uuid4().hex[:8]}.zip"
             # Áudio já comprimido não encolhe no zip; WAV também é guardado sem compressão (mais rápido)
             with zipfile.ZipFile(tmp, "w", zipfile.ZIP_STORED) as z:
-                for f in files:
-                    z.write(self._converted(f, fmt, rng), f"{_SAFE.sub('_', base)} - {f.stem}.{audio.extension(fmt)}")
+                for f, conv in zip(files, converted):
+                    z.write(conv, f"{_SAFE.sub('_', base)} - {f.stem}.{audio.extension(fmt)}")
             try:
                 size = tmp.stat().st_size
                 self.send_response(200)

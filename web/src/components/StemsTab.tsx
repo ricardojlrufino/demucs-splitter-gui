@@ -44,13 +44,17 @@ export function StemsTab({ ctx, baseName, stems, offset, formats }: Props) {
   const fileName = (s: StemResult) => `${baseName} - ${s.name}${suffix}.${extOf(format)}`;
 
   const saveOne = (s: StemResult) => {
-    downloadStem(s.path, fileName(s), format, range);
     setMsg(`Baixando ${fileName(s)}…`);
+    downloadStem(s.path, fileName(s), format, range)
+      .then(() => setMsg(`${fileName(s)} baixado.`))
+      .catch((e) => setMsg(`Falha ao baixar: ${e.message}`));
   };
 
   const saveAll = () => {
-    downloadZip(stems.map((s) => s.path), `${baseName}${suffix}`, format, range);
-    setMsg(`Baixando ${stems.length} pistas${range ? " (só o trecho selecionado)" : ""} em um arquivo zip…`);
+    setMsg(`Preparando ${stems.length} pistas${range ? " (só o trecho selecionado)" : ""} em um arquivo zip…`);
+    downloadZip(stems.map((s) => s.path), `${baseName}${suffix}`, format, range)
+      .then(() => setMsg("Zip baixado."))
+      .catch((e) => setMsg(`Falha ao baixar: ${e.message}`));
   };
 
   return (

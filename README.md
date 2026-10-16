@@ -73,9 +73,84 @@ executa o `demucs` e envia o progresso à interface. A interface (React) fica em
 - [Demucs](https://github.com/adefossez/demucs) instalado (ex.: `pipx install demucs`) e `ffmpeg`, ambos no PATH.
   O caminho do Demucs também pode ser informado dentro do app.
 - Um navegador instalado (Chrome, Edge ou Firefox).
-- Para GPU NVIDIA, o PyTorch do ambiente do Demucs precisa ser a versão CUDA, por exemplo:
+- Para usar a GPU, o PyTorch do ambiente do Demucs precisa ter suporte a ela (veja
+  [Aceleração por GPU](#aceleração-por-gpu)).
 
-      pipx runpip demucs install torch torchaudio --index-url https://download.pytorch.org/whl/cu126
+## Instalar o Demucs (guia completo)
+Baseado no guia [Complete Guide to Setting Up Demucs Locally](https://dev.to/stevecase430/complete-guide-to-setting-up-demucs-locally-for-ai-stem-separation-580h),
+adaptado para este app.
+
+### Requisitos
+- Python 3.8 ou superior (confira com `python --version`).
+- Pelo menos 4 GB livres em disco (PyTorch e modelos são grandes).
+- `ffmpeg` no PATH (Linux: `sudo apt install ffmpeg`; macOS: `brew install ffmpeg`; Windows: `winget install ffmpeg`).
+- Opcional, mas recomendado: GPU NVIDIA com CUDA (ou Apple Silicon) para separar muito mais rápido.
+
+### Instalação
+Use o `pipx`, que isola o Demucs e coloca o comando `demucs` no PATH:
+
+    pipx install demucs
+
+Verifique:
+
+    demucs --help
+
+Os modelos são baixados automaticamente na primeira execução.
+
+### Aceleração por GPU
+O Demucs usa a GPU sozinho quando o PyTorch instalado a enxerga; o que costuma dar errado é o Demucs ser instalado com o
+PyTorch só para CPU. Em GPU a separação pode ser da ordem de 10x a 50x mais rápida que em CPU.
+
+**NVIDIA (CUDA)** — depois de instalar o Demucs, troque o PyTorch do ambiente dele pela versão com CUDA:
+
+    pipx runpip demucs install torch torchaudio --index-url https://download.pytorch.org/whl/cu126
+
+- O sufixo (`cu126` = CUDA 12.6) é a versão do CUDA que acompanha o PyTorch, não precisa ser igual ao toolkit
+  instalado, mas o **driver** NVIDIA precisa ser novo o bastante (confira com `nvidia-smi`). O guia original usa
+  `cu118` (CUDA 11.8), útil para drivers/GPUs antigos. Veja os índices disponíveis em
+  [pytorch.org/get-started](https://pytorch.org/get-started/locally/).
+- Se o PyTorch de CPU continuar instalado, acrescente `--force-reinstall` ao comando.
+
+**Apple Silicon (MPS)** — o PyTorch padrão do macOS já inclui MPS; no app escolha o dispositivo "MPS". O MPS é
+menos testado no Demucs; se der erro, use "CPU".
+
+**AMD (ROCm, Linux)** — use o índice ROCm do PyTorch indicado em [pytorch.org](https://pytorch.org/get-started/locally/);
+o dispositivo aparece como `cuda`.
+
+**Conferir se a GPU está ativa:** a versão do `torch` deve terminar em `+cu126` (e não em `+cpu`); o painel "Ambiente" do app também indica.
+
+    pipx runpip demucs show torch
+
+No app, o dispositivo pode ser forçado
+(Automático / CUDA / MPS / CPU); na linha de comando use `-d cuda` ou `-d cpu`.
+
+**Memória de vídeo (erro "CUDA out of memory")** — reduza o tamanho do segmento:
+
+    demucs --segment 10 audio.mp3
+
+Se ainda faltar memória, use `-d cpu` (mais lento) ou um modelo mais leve.
+
+### Uso básico na linha de comando
+O app faz isso por você, mas é útil para testar a instalação:
+
+    demucs audio.mp3                          # 4 pistas (vocals, drums, bass, other) em ./separated
+    demucs --two-stems=vocals audio.mp3       # só voz + acompanhamento (vocals / no_vocals)
+    demucs -n htdemucs audio.mp3              # modelo padrão, mais rápido
+    demucs -n htdemucs_ft audio.mp3           # fine-tuned: melhor qualidade, mais lento
+    demucs -n htdemucs_6s audio.mp3           # 6 pistas (inclui guitarra e piano)
+    demucs -n mdx_extra_q audio.mp3           # outro modelo, qualidade alta e mais lento
+    demucs -o ./saida audio.mp3               # pasta de saída
+    demucs --mp3 audio.mp3                    # saída em MP3 (o padrão é WAV)
+    demucs musica1.mp3 musica2.mp3            # vários arquivos
+
+### Problemas comuns
+| Sintoma | Solução |
+| --- | --- |
+| `CUDA out of memory` | `--segment 10` (ou menor), modelo mais leve, ou `-d cpu` |
+| Muito lento | Instale o PyTorch com CUDA; sem GPU, use `-n htdemucs` |
+| Versão do `torch` termina em `+cpu` ou o painel "Ambiente" não mostra GPU | PyTorch de CPU instalado ou driver antigo: reinstale com `--index-url` e confira `nvidia-smi` |
+| Qualidade ruim em fala/vozes | `-n htdemucs_ft` |
+| App não acha o Demucs | Confira `demucs --help` no terminal ou informe o caminho no app |
 
 ## Instalar a partir dos fontes (Linux)
 

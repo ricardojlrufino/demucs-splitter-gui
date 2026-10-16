@@ -123,14 +123,24 @@ export async function importYoutube(
 export const cancelSeparation = (job: string) =>
   fetch(url("/api/cancel"), { method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify({ job }) });
 
-/** Dispara o download de um arquivo pelo navegador. */
-function triggerDownload(href: string) {
+/**
+ * Baixa o arquivo (fetch) e o salva a partir de um blob local. Clicar num link para a API navega a janela do WebUI
+ * (a página volta ao início); com o blob a página não sai do lugar e erros do servidor viram mensagem.
+ */
+async function triggerDownload(href: string, fileName: string): Promise<void> {
+  const res = await fetch(href);
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error((body as { error?: string }).error ?? `Erro HTTP ${res.status}`);
+  }
+  const blobUrl = URL.createObjectURL(await res.blob());
   const a = document.createElement("a");
-  a.href = href;
-  a.download = "";
+  a.href = blobUrl;
+  a.download = fileName;
   document.body.appendChild(a);
   a.click();
   a.remove();
+  setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000);
 }
 
 /** Trecho (em segundos) a exportar; omitido = arquivo inteiro. */
@@ -143,10 +153,13 @@ const rangeParams = (r?: ExportRange | null): Record<string, string> =>
   r ? { start: r.start.toFixed(3), end: r.end.toFixed(3) } : {};
 
 export const downloadStem = (path: string, fileName: string, format: string, range?: ExportRange | null) =>
-  triggerDownload(url(path, { download: fileName, format, ...rangeParams(range) }));
+  triggerDownload(url(path, { download: fileName, format, ...rangeParams(range) }), fileName);
 
 export const downloadZip = (paths: string[], baseName: string, format: string, range?: ExportRange | null) =>
-  triggerDownload(url("/api/zip", { urls: paths.join(","), base: baseName, format, ...rangeParams(range) }));
+  triggerDownload(
+    url("/api/zip", { urls: paths.join(","), base: baseName, format, ...rangeParams(range) }),
+    `${baseName} - pistas.zip`,
+  );
 
 const safe = <T,>(fn: () => T, fallback: T): T => {
   try {
